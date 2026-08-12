@@ -1,0 +1,57 @@
+<nav class="hidden md:flex bg-surface text-primary border-r border-outline-variant fixed left-0 top-0 h-full w-[280px] flex-col py-6 px-4 z-50">
+    <!-- Brand Header -->
+    <div class="flex items-center gap-3 mb-6 px-2">
+        <div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center font-extrabold text-lg shadow-sm">
+            K
+        </div>
+        <div>
+            <h1 class="text-lg font-extrabold text-primary leading-tight">Toko Maju Jaya</h1>
+            <p class="text-xs text-on-surface-variant font-medium">KasirIn Cloud POS</p>
+        </div>
+    </div>
+
+    <!-- CTA Button -->
+    <a href="/pos" class="mb-6 w-full bg-primary-container text-on-primary-container py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary transition-colors hover:text-on-primary duration-200 shadow-sm text-sm">
+        <span class="material-symbols-outlined text-[20px]">add</span>
+        Transaksi Baru
+    </a>
+
+    <!-- Navigation Menu Items -->
+    <ul class="flex flex-col gap-1.5 flex-grow">
+        <li>
+            <NavLink class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-xl font-medium text-sm" href="" Match="NavLinkMatch.All" ActiveClass="bg-primary-container text-on-primary-container font-bold shadow-sm">
+                <span class="material-symbols-outlined text-[22px]">dashboard</span>
+                <span>Analytics Dashboard</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-xl font-medium text-sm" href="pos" ActiveClass="bg-primary-container text-on-primary-container font-bold shadow-sm">
+                <span class="material-symbols-outlined text-[22px]">point_of_sale</span>
+                <span>POS Kasir</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-xl font-medium text-sm" href="inventory" ActiveClass="bg-primary-container text-on-primary-container font-bold shadow-sm">
+                <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+                <span>Manajemen Stok</span>
+            </NavLink>
+        </li>
+        <li>
+            <NavLink class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-xl font-medium text-sm" href="reports" ActiveClass="bg-primary-container text-on-primary-container font-bold shadow-sm">
+                <span class="material-symbols-outlined text-[22px]">assessment</span>
+                <span>Laporan Keuangan</span>
+            </NavLink>
+        </li>
+    </ul>
+
+    <!-- Bottom Actions -->
+    <div class="mt-auto border-t border-outline-variant pt-4 flex flex-col gap-1">
+        <div class="flex items-center gap-3 px-3 py-2 text-on-surface-variant text-sm font-medium">
+            <span class="material-symbols-outlined text-[20px]">person</span>
+            <div class="flex flex-col">
+                <span class="text-xs font-bold text-on-surface">Kasir Utama</span>
+                <span class="text-[10px] text-on-surface-variant">online@kasirin.app</span>
+            </div>
+        </div>
+    </div>
+</nav>

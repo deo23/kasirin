@@ -1,0 +1,211 @@
+@page "/"
+@page "/dashboard"
+@inject KasirInApiService ApiService
+
+<PageTitle>KasirIn - Analytics Dashboard</PageTitle>
+
+<div class="flex flex-col gap-6 max-w-[1440px] mx-auto w-full">
+    <!-- Header Overview -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Overview Dashboard</h2>
+            <p class="text-xs text-on-surface-variant font-medium mt-0.5">Ringkasan performa penjualan harian toko Anda.</p>
+        </div>
+        <p class="text-xs font-bold text-primary bg-primary-container text-on-primary-container px-3 py-1.5 rounded-full shadow-xs">
+            Hari ini, @DateTime.Now.ToString("dd MMM yyyy")
+        </p>
+    </div>
+
+    <!-- Financial KPI Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Sales Card -->
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-primary flex flex-col gap-1.5 relative overflow-hidden">
+            <div class="flex justify-between items-start">
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Penjualan Hari Ini</p>
+                <span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-1.5 text-[20px]">payments</span>
+            </div>
+            <h3 class="text-2xl font-extrabold text-on-surface tabular-nums">Rp @_report.TotalRevenue.ToString("N0")</h3>
+            <p class="text-xs font-bold text-primary flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                +12.5% dibanding kemarin
+            </p>
+        </div>
+
+        <!-- Profit Card -->
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-success flex flex-col gap-1.5">
+            <div class="flex justify-between items-start">
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Keuntungan (Net Profit)</p>
+                <span class="material-symbols-outlined text-success bg-success-container rounded-full p-1.5 text-[20px]">account_balance_wallet</span>
+            </div>
+            <h3 class="text-2xl font-extrabold text-on-surface tabular-nums">Rp @_report.NetProfit.ToString("N0")</h3>
+            <p class="text-xs font-bold text-success flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                +8.2% dibanding kemarin
+            </p>
+        </div>
+
+        <!-- Transactions Card -->
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-warning flex flex-col gap-1.5">
+            <div class="flex justify-between items-start">
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Transaksi</p>
+                <span class="material-symbols-outlined text-on-warning-container bg-warning-container rounded-full p-1.5 text-[20px]">receipt_long</span>
+            </div>
+            <h3 class="text-2xl font-extrabold text-on-surface tabular-nums">@_report.TotalTransactions Transaksi</h3>
+            <p class="text-xs font-bold text-on-surface-variant flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-[16px]">horizontal_rule</span>
+                Volume stabil
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Section: Weekly Sales Chart & Low Stock Alert -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Sales Trend Visual Chart (Spans 2 Columns) -->
+        <div class="lg:col-span-2 bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs p-5 flex flex-col h-[380px]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-on-surface">Tren Penjualan Mingguan</h3>
+                <a href="reports" class="text-xs font-bold text-primary hover:underline flex items-center gap-0.5">
+                    Detail Laporan <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- Custom CSS Bar Chart -->
+            <div class="flex-1 w-full bg-surface rounded-xl border border-outline-variant border-dashed flex items-end p-4 gap-3 relative">
+                <!-- Grid background lines -->
+                <div class="absolute inset-0 flex flex-col justify-between py-4 px-3 opacity-20 pointer-events-none">
+                    <div class="border-b border-outline w-full h-0"></div>
+                    <div class="border-b border-outline w-full h-0"></div>
+                    <div class="border-b border-outline w-full h-0"></div>
+                    <div class="border-b border-outline w-full h-0"></div>
+                </div>
+
+                <div class="flex-1 bg-primary rounded-t-lg h-[40%] hover:opacity-80 transition-all group relative flex justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-on-surface text-surface text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 1.2M</span>
+                </div>
+                <div class="flex-1 bg-primary rounded-t-lg h-[60%] hover:opacity-80 transition-all group relative flex justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-on-surface text-surface text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 2.1M</span>
+                </div>
+                <div class="flex-1 bg-primary rounded-t-lg h-[45%] hover:opacity-80 transition-all group relative flex justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-on-surface text-surface text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 1.5M</span>
+                </div>
+                <div class="flex-1 bg-primary rounded-t-lg h-[75%] hover:opacity-80 transition-all group relative flex justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-on-surface text-surface text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 3.2M</span>
+                </div>
+                <div class="flex-1 bg-primary rounded-t-lg h-[65%] hover:opacity-80 transition-all group relative flex justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-on-surface text-surface text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 2.8M</span>
+                </div>
+                <div class="flex-1 bg-primary-container rounded-t-lg h-[90%] shadow-md hover:opacity-80 transition-all group relative flex justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-on-surface text-surface text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 4.25M</span>
+                </div>
+                <div class="flex-1 bg-surface-container-high rounded-t-lg h-[30%] hover:opacity-80 transition-all group relative flex justify-center">
+                    <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-on-surface text-surface text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Est. Rp 1.0M</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-2.5 text-xs font-semibold text-on-surface-variant px-2">
+                <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span class="font-extrabold text-primary">Sab (Hari Ini)</span><span>Ming</span>
+            </div>
+        </div>
+
+        <!-- Low Stock Alert Sidebar Module -->
+        <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs p-5 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="material-symbols-outlined text-error">warning</span>
+                    <h3 class="text-base font-bold text-on-surface">Peringatan Stok Nipis</h3>
+                </div>
+
+                <ul class="flex flex-col gap-2.5">
+                    @if (_lowStockProducts.Count == 0)
+                    {
+                        <li class="p-3 text-center text-xs text-on-surface-variant bg-surface rounded-xl">Semua stok produk mencukupi!</li>
+                    }
+                    else
+                    {
+                        @foreach (var item in _lowStockProducts.Take(4))
+                        {
+                            <li class="flex justify-between items-center bg-error-container/20 p-2.5 rounded-xl border border-error-container/40">
+                                <div>
+                                    <p class="text-xs font-bold text-on-surface leading-tight">@item.Name</p>
+                                    <p class="text-[10px] text-on-surface-variant font-mono">SKU: @item.SKU</p>
+                                </div>
+                                <span class="bg-error text-on-error text-[11px] font-bold px-2 py-0.5 rounded-md">@item.StockQuantity pcs</span>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+
+            <a href="inventory" class="w-full mt-4 text-xs font-bold text-primary border border-primary hover:bg-primary hover:text-on-primary py-2.5 rounded-xl transition-colors text-center block">
+                Restok Barang
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Transactions Table -->
+    <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs overflow-hidden flex flex-col">
+        <div class="p-5 border-b border-outline-variant flex justify-between items-center bg-surface">
+            <h3 class="text-base font-bold text-on-surface">Transaksi Terakhir</h3>
+            <a href="pos" class="text-xs font-bold text-primary hover:underline flex items-center gap-0.5">
+                POS Kasir <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-surface border-b border-outline-variant text-xs text-on-surface-variant font-bold uppercase tracking-wider">
+                    <tr>
+                        <th class="py-3 px-4">Waktu</th>
+                        <th class="py-3 px-4">No. Struk</th>
+                        <th class="py-3 px-4">Item Terjual</th>
+                        <th class="py-3 px-4">Metode</th>
+                        <th class="py-3 px-4 text-right">Total Transaksi</th>
+                        <th class="py-3 px-4 text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="text-xs divide-y divide-outline-variant">
+                    @if (_recentTransactions.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="py-6 text-center text-on-surface-variant">Belum ada transaksi hari ini.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var trx in _recentTransactions)
+                        {
+                            <tr class="hover:bg-surface-container-low transition-colors">
+                                <td class="py-3 px-4 text-on-surface-variant">@trx.TransactionDate.ToString("HH:mm")</td>
+                                <td class="py-3 px-4 font-mono font-bold text-on-surface">@trx.InvoiceNumber</td>
+                                <td class="py-3 px-4 text-on-surface">@(trx.Items.Count > 0 ? $"{trx.Items.Count} item" : "1 item")</td>
+                                <td class="py-3 px-4 font-bold text-on-surface-variant">@trx.PaymentMethod</td>
+                                <td class="py-3 px-4 text-right font-mono font-bold text-primary">Rp @trx.TotalAmount.ToString("N0")</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="bg-success-container text-on-success-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Lunas</span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ProfitReportDto _report = new();
+    private List<ProductDto> _lowStockProducts = new();
+    private List<TransactionDto> _recentTransactions = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var start = DateTime.Today;
+        var end = DateTime.Now;
+        _report = await ApiService.GetProfitReportAsync(start, end);
+
+        var products = await ApiService.GetProductsAsync();
+        _lowStockProducts = products.Where(p => p.StockQuantity < 5).ToList();
+
+        _recentTransactions = await ApiService.GetSalesHistoryAsync();
+    }
+}

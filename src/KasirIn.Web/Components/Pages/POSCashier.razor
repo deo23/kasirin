@@ -1,0 +1,467 @@
+@page "/pos"
+@inject KasirInApiService ApiService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>KasirIn - POS Kasir</PageTitle>
+
+<div class="flex flex-col lg:flex-row h-[calc(100vh-5rem)] gap-4 overflow-hidden">
+    <!-- Left Column: Product Search & Product Grid -->
+    <div class="flex-1 flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-sm overflow-hidden min-w-0">
+        <!-- Search & Filter Header -->
+        <div class="p-4 border-b border-outline-variant bg-surface flex flex-col gap-3">
+            <div class="relative w-full">
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px]">search</span>
+                <input type="text"
+                       class="w-full pl-11 pr-10 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder:text-on-surface-variant"
+                       placeholder="Cari produk berdasarkan nama atau SKU..."
+                       @bind="_searchTerm"
+                       @bind:event="oninput"
+                       @onkeyup="FilterProducts" />
+                @if (!string.IsNullOrEmpty(_searchTerm))
+                {
+                    <button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface" @onclick="ClearSearch">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                }
+            </div>
+
+            <!-- Quick Category Filters -->
+            <div class="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
+                @foreach (var cat in _categories)
+                {
+                    <button class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 @(cat == _selectedCategory ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container text-on-surface border border-outline-variant hover:bg-surface-container-highest")"
+                            @onclick="() => SelectCategory(cat)">
+                        @cat
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="flex-1 overflow-y-auto p-4 bg-surface grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3.5 auto-rows-max">
+            @if (_isLoading)
+            {
+                <div class="col-span-full flex items-center justify-center py-12 text-on-surface-variant gap-2 font-medium">
+                    <span class="material-symbols-outlined animate-spin">sync</span> Memuat daftar produk...
+                </div>
+            }
+            else if (_filteredProducts.Count == 0)
+            {
+                <div class="col-span-full flex flex-col items-center justify-center py-12 text-on-surface-variant gap-2">
+                    <span class="material-symbols-outlined text-4xl">inventory_2</span>
+                    <p class="text-sm font-medium">Tidak ada produk ditemukan</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var product in _filteredProducts)
+                {
+                    <div class="bg-surface-container-lowest rounded-xl border @(product.IsLowStock ? "border-error" : "border-outline-variant") p-3 flex flex-col gap-2 cursor-pointer hover:border-primary hover:shadow-md transition-all group relative"
+                         @onclick="() => AddToCart(product)">
+                        <div class="absolute top-2 right-2 @(product.IsLowStock ? "bg-error text-on-error" : "bg-surface-container-highest text-on-surface border border-outline-variant") px-2 py-0.5 rounded-md text-[11px] font-bold z-10">
+                            Stk: @product.StockQuantity
+                        </div>
+                        <div class="w-full aspect-square rounded-lg bg-surface-container overflow-hidden flex items-center justify-center">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined text-outline text-4xl">shopping_bag</span>
+                            }
+                        </div>
+                        <div class="flex flex-col mt-0.5">
+                            <h3 class="text-xs font-semibold text-on-surface line-clamp-2 leading-snug">@product.Name</h3>
+                            <p class="text-sm font-bold text-primary tabular-nums mt-1">Rp @product.SellingPrice.ToString("N0")</p>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Right Column: Interactive Cart & Checkout -->
+    <div class="w-full lg:w-[380px] xl:w-[420px] flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-sm overflow-hidden flex-shrink-0">
+        <!-- Cart Header -->
+        <div class="p-4 border-b border-outline-variant bg-surface flex justify-between items-center">
+            <h2 class="text-base font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">shopping_cart</span>
+                Keranjang Belanja (@_cartItems.Sum(i => i.Quantity))
+            </h2>
+            @if (_cartItems.Count > 0)
+            {
+                <button class="text-error text-xs font-bold hover:bg-error-container hover:text-on-error-container px-2 py-1 rounded-lg transition-colors" @onclick="ClearCart">
+                    Kosongkan
+                </button>
+            }
+        </div>
+
+        <!-- Cart Items List -->
+        <div class="flex-1 overflow-y-auto p-4 bg-surface flex flex-col gap-3">
+            @if (_cartItems.Count == 0)
+            {
+                <div class="h-full flex flex-col items-center justify-center text-on-surface-variant gap-2 py-12">
+                    <span class="material-symbols-outlined text-5xl text-outline-variant">remove_shopping_cart</span>
+                    <p class="text-sm font-semibold">Keranjang masih kosong</p>
+                    <p class="text-xs text-center text-on-surface-variant">Klik pada produk di sebelah kiri untuk menambahkan ke pesanan</p>
+                </div>
+            }
+            else
+            {
+                @foreach (var item in _cartItems)
+                {
+                    <div class="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant flex flex-col gap-2 shadow-xs">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xs font-semibold text-on-surface max-w-[70%] leading-tight">@item.ProductName</h4>
+                            <span class="text-sm font-bold text-on-surface tabular-nums">Rp @(item.SubTotal.ToString("N0"))</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-[11px] text-on-surface-variant tabular-nums">Rp @item.UnitPrice.ToString("N0") / unit</span>
+                            <div class="flex items-center bg-surface-container rounded-lg border border-outline-variant overflow-hidden">
+                                <button class="w-7 h-7 flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors" @onclick="() => DecreaseQty(item)">
+                                    <span class="material-symbols-outlined text-[16px]">remove</span>
+                                </button>
+                                <span class="w-8 text-center text-xs font-bold text-on-surface tabular-nums">@item.Quantity</span>
+                                <button class="w-7 h-7 flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors" @onclick="() => IncreaseQty(item)">
+                                    <span class="material-symbols-outlined text-[16px]">add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Checkout Section -->
+        <div class="border-t border-outline-variant bg-surface-container-lowest p-4 flex flex-col gap-3 shadow-md">
+            <div class="flex flex-col gap-1.5 text-xs">
+                <div class="flex justify-between items-center text-on-surface-variant">
+                    <span>Subtotal (@_cartItems.Sum(i => i.Quantity) item)</span>
+                    <span class="font-bold tabular-nums">Rp @CartSubTotal.ToString("N0")</span>
+                </div>
+                <div class="flex justify-between items-center text-on-surface-variant">
+                    <span>PPN (10%)</span>
+                    <span class="font-bold tabular-nums">Rp @CartTax.ToString("N0")</span>
+                </div>
+                <div class="h-px bg-outline-variant w-full my-1"></div>
+                <div class="flex justify-between items-end">
+                    <span class="text-base font-bold text-on-surface">Total Pembayaran</span>
+                    <span class="text-lg font-extrabold text-primary tabular-nums">Rp @CartGrandTotal.ToString("N0")</span>
+                </div>
+            </div>
+
+            <button class="w-full h-12 bg-primary text-on-primary rounded-xl font-bold text-sm hover:bg-primary-hover transition-all duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled="@(_cartItems.Count == 0)"
+                    @onclick="OpenCheckoutModal">
+                <span class="material-symbols-outlined">payments</span>
+                Bayar Rp @CartGrandTotal.ToString("N0")
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Checkout & Kalkulator Kembalian -->
+@if (_showCheckoutModal)
+{
+    <div class="fixed inset-0 bg-on-surface/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-surface-container-lowest rounded-2xl max-w-md w-full p-6 shadow-2xl border border-outline-variant flex flex-col gap-5">
+            <div class="flex justify-between items-center pb-3 border-b border-outline-variant">
+                <h3 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">point_of_sale</span> Pembayaran Kasir
+                </h3>
+                <button class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg" @onclick="CloseCheckoutModal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Summary Total -->
+            <div class="bg-surface-container p-4 rounded-xl flex justify-between items-center">
+                <span class="text-xs font-semibold text-on-surface-variant">Total Tagihan</span>
+                <span class="text-2xl font-extrabold text-primary tabular-nums">Rp @CartGrandTotal.ToString("N0")</span>
+            </div>
+
+            <!-- Metode Pembayaran -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-on-surface-variant">Metode Pembayaran</label>
+                <div class="grid grid-cols-3 gap-2">
+                    @foreach (var method in new[] { "CASH", "QRIS", "TRANSFER" })
+                    {
+                        <button class="py-2.5 rounded-xl border text-xs font-bold transition-all @(_paymentMethod == method ? "bg-primary text-on-primary border-primary shadow-xs" : "bg-surface text-on-surface border-outline-variant hover:bg-surface-container")"
+                                @onclick="() => SelectPaymentMethod(method)">
+                            @method
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Input Uang Dibayar -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-on-surface-variant">Nominal Uang Uang Dibayar</label>
+                <input type="number" class="w-full px-4 py-3 text-lg font-extrabold text-on-surface bg-surface border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary focus:border-primary tabular-nums"
+                       @bind="_paidAmount" @bind:event="oninput" placeholder="Masukkan jumlah nominal..." />
+                
+                <!-- Quick Amount Buttons -->
+                <div class="flex gap-2 flex-wrap mt-1">
+                    <button class="px-3 py-1 bg-surface-container border border-outline-variant rounded-lg text-xs font-bold text-on-surface hover:bg-surface-container-high" @onclick="() => SetPaidAmount(CartGrandTotal)">Uang Pas</button>
+                    <button class="px-3 py-1 bg-surface-container border border-outline-variant rounded-lg text-xs font-bold text-on-surface hover:bg-surface-container-high" @onclick="() => SetPaidAmount(50000)">Rp 50.000</button>
+                    <button class="px-3 py-1 bg-surface-container border border-outline-variant rounded-lg text-xs font-bold text-on-surface hover:bg-surface-container-high" @onclick="() => SetPaidAmount(100000)">Rp 100.000</button>
+                </div>
+            </div>
+
+            <!-- Kembalian Display -->
+            <div class="p-4 rounded-xl border @(CalculatedChange >= 0 ? "bg-success-container border-success/30 text-on-success-container" : "bg-error-container border-error/30 text-on-error-container") flex justify-between items-center">
+                <span class="text-xs font-bold">Kembalian</span>
+                <span class="text-xl font-extrabold tabular-nums">
+                    @(CalculatedChange >= 0 ? $"Rp {CalculatedChange:N0}" : "Uang Kurang!")
+                </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-3 pt-2">
+                <button class="flex-1 py-3 bg-surface border border-outline-variant text-on-surface rounded-xl font-bold text-sm hover:bg-surface-container" @onclick="CloseCheckoutModal">Batal</button>
+                <button class="flex-1 py-3 bg-primary text-on-primary rounded-xl font-bold text-sm hover:bg-primary-hover shadow-sm disabled:opacity-50"
+                        disabled="@(CalculatedChange < 0 || _isSubmitting)"
+                        @onclick="ProcessTransaction">
+                    @(_isSubmitting ? "Memproses..." : "Selesaikan Transaksi")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Modal Struk PDF / Cetak Struk -->
+@if (_showReceiptModal && _lastReceipt != null)
+{
+    <div class="fixed inset-0 bg-on-surface/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-surface-container-lowest rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-outline-variant flex flex-col gap-4">
+            <div class="text-center pb-3 border-b border-outline-variant flex flex-col items-center">
+                <div class="w-12 h-12 rounded-full bg-success-container text-on-success-container flex items-center justify-center mb-2">
+                    <span class="material-symbols-outlined text-2xl">check_circle</span>
+                </div>
+                <h3 class="text-base font-extrabold text-on-surface">Transaksi Sukses!</h3>
+                <p class="text-xs text-on-surface-variant font-medium">Struk Struk KasirIn #@_lastReceipt.InvoiceNumber</p>
+            </div>
+
+            <!-- Thermal Receipt Preview -->
+            <div id="receipt-print-area" class="bg-surface p-4 rounded-xl border border-outline-variant font-mono text-xs text-on-surface flex flex-col gap-2 shadow-inner">
+                <div class="text-center font-bold text-sm">TOKO MAJU JAYA</div>
+                <div class="text-center text-[10px] text-on-surface-variant">Jl. Raya Utama No. 123, Jakarta</div>
+                <div class="text-center text-[10px] text-on-surface-variant">Telp: 0812-3456-7890</div>
+                <div class="border-b border-dashed border-outline-variant my-1"></div>
+                <div class="flex justify-between text-[11px]">
+                    <span>Faktur: @_lastReceipt.InvoiceNumber</span>
+                    <span>@_lastReceipt.TransactionDate.ToString("HH:mm")</span>
+                </div>
+                <div class="border-b border-dashed border-outline-variant my-1"></div>
+                @foreach (var item in _lastReceipt.Items)
+                {
+                    <div class="flex flex-col gap-0.5">
+                        <div class="font-bold">@item.ProductName</div>
+                        <div class="flex justify-between text-[11px] text-on-surface-variant">
+                            <span>@item.Quantity x Rp @item.UnitPrice.ToString("N0")</span>
+                            <span class="font-bold text-on-surface">Rp @item.SubTotal.ToString("N0")</span>
+                        </div>
+                    </div>
+                }
+                <div class="border-b border-dashed border-outline-variant my-1"></div>
+                <div class="flex justify-between text-xs font-bold">
+                    <span>Total:</span>
+                    <span>Rp @_lastReceipt.TotalAmount.ToString("N0")</span>
+                </div>
+                <div class="flex justify-between text-[11px]">
+                    <span>Bayar (@_lastReceipt.PaymentMethod):</span>
+                    <span>Rp @_lastReceipt.PaidAmount.ToString("N0")</span>
+                </div>
+                <div class="flex justify-between text-[11px]">
+                    <span>Kembali:</span>
+                    <span>Rp @_lastReceipt.ChangeAmount.ToString("N0")</span>
+                </div>
+                <div class="border-b border-dashed border-outline-variant my-1"></div>
+                <div class="text-center text-[10px] text-on-surface-variant mt-1">Terima Kasih atas Kunjungan Anda!</div>
+            </div>
+
+            <!-- Receipt Actions -->
+            <div class="flex gap-2 pt-2">
+                <button class="flex-1 py-2.5 bg-surface border border-outline-variant text-on-surface rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container"
+                        @onclick="TriggerPrint">
+                    <span class="material-symbols-outlined text-[18px]">print</span> Cetak Struk
+                </button>
+                <button class="flex-1 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-primary-hover shadow-xs"
+                        @onclick="CloseReceiptModal">
+                    <span class="material-symbols-outlined text-[18px]">done</span> Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProductDto> _products = new();
+    private List<ProductDto> _filteredProducts = new();
+    private List<CartItemModel> _cartItems = new();
+    private List<string> _categories = new() { "Semua", "Snacks", "Drinks", "Groceries", "Beverages" };
+    private string _selectedCategory = "Semua";
+    private string _searchTerm = string.Empty;
+    private bool _isLoading = true;
+
+    // Checkout Modal State
+    private bool _showCheckoutModal = false;
+    private string _paymentMethod = "CASH";
+    private decimal _paidAmount = 0;
+    private bool _isSubmitting = false;
+
+    // Receipt Modal State
+    private bool _showReceiptModal = false;
+    private TransactionDto? _lastReceipt = null;
+
+    private decimal CartSubTotal => _cartItems.Sum(i => i.SubTotal);
+    private decimal CartTax => CartSubTotal * 0.10m;
+    private decimal CartGrandTotal => CartSubTotal + CartTax;
+    private decimal CalculatedChange => _paidAmount - CartGrandTotal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        _isLoading = true;
+        _products = await ApiService.GetProductsAsync();
+        FilterProducts();
+        _isLoading = false;
+    }
+
+    private void FilterProducts()
+    {
+        var items = _products.AsEnumerable();
+        if (_selectedCategory != "Semua")
+        {
+            items = items.Where(p => p.CategoryName.Equals(_selectedCategory, StringComparison.OrdinalIgnoreCase));
+        }
+        if (!string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            items = items.Where(p => p.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                                     p.SKU.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase));
+        }
+        _filteredProducts = items.ToList();
+    }
+
+    private void SelectCategory(string category)
+    {
+        _selectedCategory = category;
+        FilterProducts();
+    }
+
+    private void ClearSearch()
+    {
+        _searchTerm = string.Empty;
+        FilterProducts();
+    }
+
+    private void AddToCart(ProductDto product)
+    {
+        var existing = _cartItems.FirstOrDefault(c => c.ProductId == product.Id);
+        if (existing != null)
+        {
+            existing.Quantity++;
+        }
+        else
+        {
+            _cartItems.Add(new CartItemModel
+            {
+                ProductId = product.Id,
+                ProductName = product.Name,
+                UnitPrice = product.SellingPrice,
+                Quantity = 1
+            });
+        }
+    }
+
+    private void IncreaseQty(CartItemModel item) => item.Quantity++;
+
+    private void DecreaseQty(CartItemModel item)
+    {
+        item.Quantity--;
+        if (item.Quantity <= 0)
+        {
+            _cartItems.Remove(item);
+        }
+    }
+
+    private void ClearCart() => _cartItems.Clear();
+
+    private void OpenCheckoutModal()
+    {
+        _paidAmount = CartGrandTotal;
+        _showCheckoutModal = true;
+    }
+
+    private void CloseCheckoutModal() => _showCheckoutModal = false;
+
+    private void SelectPaymentMethod(string method) => _paymentMethod = method;
+
+    private void SetPaidAmount(decimal amount) => _paidAmount = amount;
+
+    private async Task ProcessTransaction()
+    {
+        if (_cartItems.Count == 0 || CalculatedChange < 0 || _isSubmitting) return;
+
+        _isSubmitting = true;
+        var command = new CreateTransactionCommand
+        {
+            TenantId = KasirInApiService.DefaultTenantId,
+            UserId = Guid.NewGuid(),
+            PaymentMethod = _paymentMethod,
+            PaidAmount = _paidAmount,
+            Items = _cartItems.Select(i => new CreateTransactionItemCommandDto(i.ProductId, i.Quantity)).ToList()
+        };
+
+        var trxId = await ApiService.CreateTransactionAsync(command);
+
+        _lastReceipt = new TransactionDto
+        {
+            Id = trxId,
+            TenantId = KasirInApiService.DefaultTenantId,
+            InvoiceNumber = $"TRX-{Random.Shared.Next(1000, 9999)}",
+            TransactionDate = DateTime.Now,
+            TotalAmount = CartGrandTotal,
+            PaidAmount = _paidAmount,
+            ChangeAmount = CalculatedChange,
+            PaymentMethod = _paymentMethod,
+            Items = _cartItems.Select(i => new TransactionItemDto
+            {
+                ProductId = i.ProductId,
+                ProductName = i.ProductName,
+                Quantity = i.Quantity,
+                UnitPrice = i.UnitPrice,
+                SubTotal = i.SubTotal
+            }).ToList()
+        };
+
+        _isSubmitting = false;
+        _showCheckoutModal = false;
+        _showReceiptModal = true;
+
+        // Clear cart after payment
+        _cartItems.Clear();
+        await LoadProducts();
+    }
+
+    private void CloseReceiptModal() => _showReceiptModal = false;
+
+    private async Task TriggerPrint()
+    {
+        await JSRuntime.InvokeVoidAsync("window.print");
+    }
+
+    private class CartItemModel
+    {
+        public Guid ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
+        public decimal SubTotal => UnitPrice * Quantity;
+    }
+}

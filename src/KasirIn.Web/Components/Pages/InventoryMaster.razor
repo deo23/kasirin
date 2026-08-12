@@ -1,0 +1,354 @@
+@page "/inventory"
+@inject KasirInApiService ApiService
+
+<PageTitle>KasirIn - Manajemen Stok & Inventaris</PageTitle>
+
+<div class="flex flex-col gap-6 max-w-[1440px] mx-auto w-full">
+    <!-- Header Title & Action Buttons -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Manajemen Stok & Inventaris</h2>
+            <p class="text-xs text-on-surface-variant font-medium mt-0.5">Kelola katalog produk, tingkat stok barang, dan penetapan harga modal/jual.</p>
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <button class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-on-primary rounded-xl hover:bg-primary-hover transition-colors text-xs font-bold shadow-xs"
+                    @onclick="OpenAddProductModal">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Tambah Produk
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats KPI Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Total Products Card -->
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-primary flex items-center justify-between">
+            <div>
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Produk</p>
+                <p class="text-2xl font-extrabold text-on-surface mt-1 tabular-nums">@_products.Count</p>
+            </div>
+            <div class="w-11 h-11 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+                <span class="material-symbols-outlined">inventory_2</span>
+            </div>
+        </div>
+
+        <!-- Low Stock Card -->
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-error flex items-center justify-between">
+            <div>
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Stok Menipis (&lt; 5 pcs)</p>
+                <p class="text-2xl font-extrabold text-error mt-1 tabular-nums">@LowStockCount</p>
+            </div>
+            <div class="w-11 h-11 rounded-full bg-error-container text-on-error-container flex items-center justify-center">
+                <span class="material-symbols-outlined">warning</span>
+            </div>
+        </div>
+
+        <!-- Inventory Value Card -->
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-success flex items-center justify-between">
+            <div>
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Nilai Inventaris</p>
+                <p class="text-2xl font-extrabold text-on-surface mt-1 tabular-nums">Rp @TotalInventoryValue.ToString("N0")</p>
+            </div>
+            <div class="w-11 h-11 rounded-full bg-success-container text-on-success-container flex items-center justify-center">
+                <span class="material-symbols-outlined">payments</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs overflow-hidden">
+        <!-- Search Bar Header -->
+        <div class="p-4 border-b border-outline-variant bg-surface flex justify-between items-center gap-4">
+            <div class="relative w-full max-w-md">
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+                <input type="text"
+                       class="w-full pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder:text-on-surface-variant"
+                       placeholder="Cari inventaris berdasarkan nama atau SKU..."
+                       @bind="_searchTerm"
+                       @bind:event="oninput"
+                       @onkeyup="FilterProducts" />
+            </div>
+            <div class="flex items-center gap-2">
+                <select class="px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                        @bind="_selectedCategory" @bind:after="FilterProducts">
+                    <option value="Semua">Semua Kategori</option>
+                    <option value="Snacks">Snacks</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Groceries">Groceries</option>
+                    <option value="Beverages">Beverages</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Product Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-surface border-b border-outline-variant text-xs text-on-surface-variant font-bold uppercase tracking-wider">
+                    <tr>
+                        <th class="py-3.5 px-4">SKU</th>
+                        <th class="py-3.5 px-4">Nama Produk</th>
+                        <th class="py-3.5 px-4">Kategori</th>
+                        <th class="py-3.5 px-4 text-right">Stok</th>
+                        <th class="py-3.5 px-4 text-right">Harga Modal (HPP)</th>
+                        <th class="py-3.5 px-4 text-right">Harga Jual</th>
+                        <th class="py-3.5 px-4 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-xs divide-y divide-outline-variant">
+                    @if (_isLoading)
+                    {
+                        <tr>
+                            <td colspan="7" class="py-8 text-center text-on-surface-variant">
+                                <span class="material-symbols-outlined animate-spin text-lg align-middle mr-1">sync</span> Memuat data produk...
+                            </td>
+                        </tr>
+                    }
+                    else if (_filteredProducts.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="py-8 text-center text-on-surface-variant">Tidak ada produk ditemukan.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var prod in _filteredProducts)
+                        {
+                            <tr class="hover:bg-surface-container-low transition-colors">
+                                <td class="py-3 px-4 font-mono font-bold text-on-surface-variant">@prod.SKU</td>
+                                <td class="py-3 px-4 font-semibold text-on-surface">
+                                    <div class="flex items-center gap-2.5">
+                                        @if (!string.IsNullOrEmpty(prod.ImageUrl))
+                                        {
+                                            <img src="@prod.ImageUrl" alt="@prod.Name" class="w-8 h-8 rounded-lg object-cover border border-outline-variant" />
+                                        }
+                                        <span>@prod.Name</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-on-surface-variant">@prod.CategoryName</td>
+                                <td class="py-3 px-4 text-right">
+                                    @if (prod.StockQuantity < 5)
+                                    {
+                                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-extrabold text-[11px] ring-1 ring-error">
+                                            @prod.StockQuantity pcs (Nipis)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-success-container text-on-success-container font-bold text-[11px]">
+                                            @prod.StockQuantity pcs
+                                        </span>
+                                    }
+                                </td>
+                                <td class="py-3 px-4 text-right font-mono text-on-surface-variant">Rp @prod.CostPrice.ToString("N0")</td>
+                                <td class="py-3 px-4 text-right font-mono font-bold text-primary">Rp @prod.SellingPrice.ToString("N0")</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button class="text-on-surface-variant hover:text-primary transition-colors p-1" @onclick="() => EditProduct(prod)" title="Edit">
+                                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add / Edit Product Modal -->
+@if (_showProductModal)
+{
+    <div class="fixed inset-0 bg-on-surface/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-surface-container-lowest rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-outline-variant flex flex-col gap-4">
+            <div class="flex justify-between items-center pb-3 border-b border-outline-variant">
+                <h3 class="text-base font-extrabold text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">add_box</span>
+                    @(_isEditing ? "Edit Produk" : "Tambah Produk Baru")
+                </h3>
+                <button class="text-on-surface-variant hover:text-on-surface" @onclick="CloseProductModal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <EditForm Model="_formModel" OnValidSubmit="SaveProduct" class="flex flex-col gap-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Nama Produk</label>
+                        <InputText @bind-Value="_formModel.Name" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" placeholder="Contoh: Kopi Kenangan 250g" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Kode SKU</label>
+                        <InputText @bind-Value="_formModel.SKU" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" placeholder="Contoh: PRD-005" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Kategori</label>
+                        <InputSelect @bind-Value="_formModel.CategoryName" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary">
+                            <option value="Snacks">Snacks</option>
+                            <option value="Drinks">Drinks</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Beverages">Beverages</option>
+                        </InputSelect>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Stok Barang (Pcs)</label>
+                        <InputNumber @bind-Value="_formModel.StockQuantity" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Harga Modal / HPP (Rp)</label>
+                        <InputNumber @bind-Value="_formModel.CostPrice" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Harga Jual (Rp)</label>
+                        <InputNumber @bind-Value="_formModel.SellingPrice" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" />
+                    </div>
+                </div>
+
+                <!-- Upload Foto Produk (WebP / JPG / PNG) -->
+                <div>
+                    <label class="text-xs font-bold text-on-surface-variant mb-1 block">Foto Produk (WebP / Gambar)</label>
+                    <InputFile OnChange="HandleFileSelected" accept="image/webp,image/png,image/jpeg" class="w-full text-xs text-on-surface-variant file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary-container file:text-on-primary-container hover:file:bg-primary hover:file:text-on-primary" />
+                    @if (!string.IsNullOrEmpty(_uploadedImageUrl))
+                    {
+                        <div class="mt-2 flex items-center gap-2">
+                            <img src="@_uploadedImageUrl" alt="Preview" class="w-12 h-12 object-cover rounded-lg border border-outline-variant" />
+                            <span class="text-xs text-success font-bold">Gambar berhasil disiapkan</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="flex gap-3 pt-3 border-t border-outline-variant mt-2">
+                    <button type="button" class="flex-1 py-2.5 bg-surface border border-outline-variant text-on-surface rounded-xl font-bold text-xs hover:bg-surface-container" @onclick="CloseProductModal">Batal</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-xs hover:bg-primary-hover shadow-xs" disabled="@_isSaving">
+                        @(_isSaving ? "Menyimpan..." : "Simpan Produk")
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProductDto> _products = new();
+    private List<ProductDto> _filteredProducts = new();
+    private string _searchTerm = string.Empty;
+    private string _selectedCategory = "Semua";
+    private bool _isLoading = true;
+
+    // Modal State
+    private bool _showProductModal = false;
+    private bool _isEditing = false;
+    private bool _isSaving = false;
+    private ProductFormModel _formModel = new();
+    private string? _uploadedImageUrl;
+
+    private int LowStockCount => _products.Count(p => p.StockQuantity < 5);
+    private decimal TotalInventoryValue => _products.Sum(p => p.CostPrice * p.StockQuantity);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        _isLoading = true;
+        _products = await ApiService.GetProductsAsync();
+        FilterProducts();
+        _isLoading = false;
+    }
+
+    private void FilterProducts()
+    {
+        var items = _products.AsEnumerable();
+        if (_selectedCategory != "Semua")
+        {
+            items = items.Where(p => p.CategoryName.Equals(_selectedCategory, StringComparison.OrdinalIgnoreCase));
+        }
+        if (!string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            items = items.Where(p => p.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                                     p.SKU.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase));
+        }
+        _filteredProducts = items.ToList();
+    }
+
+    private void OpenAddProductModal()
+    {
+        _isEditing = false;
+        _formModel = new ProductFormModel();
+        _uploadedImageUrl = null;
+        _showProductModal = true;
+    }
+
+    private void EditProduct(ProductDto prod)
+    {
+        _isEditing = true;
+        _formModel = new ProductFormModel
+        {
+            Id = prod.Id,
+            Name = prod.Name,
+            SKU = prod.SKU,
+            CategoryName = prod.CategoryName,
+            CostPrice = prod.CostPrice,
+            SellingPrice = prod.SellingPrice,
+            StockQuantity = prod.StockQuantity,
+            MinStockThreshold = prod.MinStockThreshold,
+            ImageUrl = prod.ImageUrl
+        };
+        _uploadedImageUrl = prod.ImageUrl;
+        _showProductModal = true;
+    }
+
+    private void CloseProductModal() => _showProductModal = false;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            _uploadedImageUrl = await ApiService.UploadProductImageAsync(file);
+        }
+    }
+
+    private async Task SaveProduct()
+    {
+        _isSaving = true;
+        var command = new CreateProductCommand
+        {
+            TenantId = KasirInApiService.DefaultTenantId,
+            CategoryId = Guid.NewGuid(),
+            Name = _formModel.Name,
+            SKU = string.IsNullOrEmpty(_formModel.SKU) ? $"PRD-{Random.Shared.Next(100, 999)}" : _formModel.SKU,
+            CostPrice = _formModel.CostPrice,
+            SellingPrice = _formModel.SellingPrice,
+            StockQuantity = _formModel.StockQuantity,
+            MinStockThreshold = 5,
+            ImageFileName = _formModel.CategoryName,
+            ImageUrl = _uploadedImageUrl ?? "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400"
+        };
+
+        await ApiService.CreateProductAsync(command);
+        _isSaving = false;
+        _showProductModal = false;
+        await LoadProducts();
+    }
+
+    private class ProductFormModel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string SKU { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = "Snacks";
+        public decimal CostPrice { get; set; } = 5000;
+        public decimal SellingPrice { get; set; } = 8000;
+        public int StockQuantity { get; set; } = 10;
+        public int MinStockThreshold { get; set; } = 5;
+        public string? ImageUrl { get; set; }
+    }
+}
