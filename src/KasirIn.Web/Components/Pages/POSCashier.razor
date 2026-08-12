@@ -141,6 +141,27 @@
                     <span>Subtotal (@_cartItems.Sum(i => i.Quantity) item)</span>
                     <span class="font-bold tabular-nums">Rp @CartSubTotal.ToString("N0")</span>
                 </div>
+
+                <!-- Input Diskon Transaksi (Rp / %) -->
+                <div class="flex justify-between items-center text-on-surface-variant gap-2 my-0.5">
+                    <div class="flex items-center gap-1">
+                        <span class="font-semibold text-on-surface">Diskon Promo</span>
+                        <select @bind="_discountType" class="text-[11px] font-extrabold bg-surface border border-outline-variant rounded-lg px-1 py-0.5 text-primary">
+                            <option value="RP">Rp</option>
+                            <option value="%">%</option>
+                        </select>
+                    </div>
+                    <input type="number" min="0" @bind="_discountValue" @bind:event="oninput" placeholder="0" class="w-24 px-2 py-1 text-right text-xs font-bold bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary tabular-nums" />
+                </div>
+
+                @if (CartDiscountAmount > 0)
+                {
+                    <div class="flex justify-between items-center text-error font-bold bg-error-container/30 px-2 py-1 rounded-lg">
+                        <span>Potongan Diskon</span>
+                        <span class="tabular-nums">- Rp @CartDiscountAmount.ToString("N0")</span>
+                    </div>
+                }
+
                 <div class="flex justify-between items-center text-on-surface-variant">
                     <span>PPN (10%)</span>
                     <span class="font-bold tabular-nums">Rp @CartTax.ToString("N0")</span>
@@ -312,13 +333,19 @@
     private decimal _paidAmount = 0;
     private bool _isSubmitting = false;
 
+    // Discount State
+    private string _discountType = "RP";
+    private decimal _discountValue = 0;
+
     // Receipt Modal State
     private bool _showReceiptModal = false;
     private TransactionDto? _lastReceipt = null;
 
     private decimal CartSubTotal => _cartItems.Sum(i => i.SubTotal);
-    private decimal CartTax => CartSubTotal * 0.10m;
-    private decimal CartGrandTotal => CartSubTotal + CartTax;
+    private decimal CartDiscountAmount => _discountType == "%" ? CartSubTotal * (Math.Clamp(_discountValue, 0, 100) / 100m) : Math.Clamp(_discountValue, 0, CartSubTotal);
+    private decimal NetSubTotal => Math.Max(0, CartSubTotal - CartDiscountAmount);
+    private decimal CartTax => NetSubTotal * 0.10m;
+    private decimal CartGrandTotal => NetSubTotal + CartTax;
     private decimal CalculatedChange => _paidAmount - CartGrandTotal;
 
     protected override async Task OnInitializedAsync()

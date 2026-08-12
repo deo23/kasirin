@@ -1,6 +1,7 @@
 @page "/reports"
 @rendermode InteractiveServer
 @inject KasirInApiService ApiService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>KasirIn - Laporan Keuangan & Kasbon</PageTitle>
 
@@ -113,13 +114,14 @@
                             <th class="py-3 px-4 text-right">Dibayar</th>
                             <th class="py-3 px-4 text-right">Sisa Utang</th>
                             <th class="py-3 px-4 text-center">Status</th>
+                            <th class="py-3 px-4 text-center">Aksi Tagihan</th>
                         </tr>
                     </thead>
                     <tbody class="text-xs divide-y divide-outline-variant">
                         @if (_debts.Count == 0)
                         {
                             <tr>
-                                <td colspan="6" class="py-6 text-center text-on-surface-variant">Belum ada catatan kasbon.</td>
+                                <td colspan="7" class="py-6 text-center text-on-surface-variant">Belum ada catatan kasbon.</td>
                             </tr>
                         }
                         else
@@ -140,6 +142,19 @@
                                         else
                                         {
                                             <span class="bg-error-container text-on-error-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Belum Lunas</span>
+                                        }
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        @if (!debt.IsSettled && !string.IsNullOrWhiteSpace(debt.CustomerPhone))
+                                        {
+                                            <button type="button" class="inline-flex items-center gap-1.5 bg-[#25D366] text-white hover:bg-[#128C7E] px-3 py-1.5 rounded-xl font-bold text-[11px] transition-colors shadow-xs cursor-pointer"
+                                                    @onclick="() => SendWhatsAppReminder(debt)" title="Kirim Tagihan via WhatsApp">
+                                                <span class="material-symbols-outlined text-[14px]">send</span> Tagih WA
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-[11px] text-on-surface-variant font-medium">-</span>
                                         }
                                     </td>
                                 </tr>
@@ -293,6 +308,19 @@
         await ApiService.CreateDebtAsync(command);
         _showDebtModal = false;
         await LoadData();
+    }
+
+    private async Task SendWhatsAppReminder(CustomerDebtDto debt)
+    {
+        var cleanPhone = debt.CustomerPhone.Trim().Replace("-", "").Replace(" ", "").Replace("+", "");
+        if (cleanPhone.StartsWith("0"))
+        {
+            cleanPhone = "62" + cleanPhone.Substring(1);
+        }
+        var message = $"Halo *{debt.CustomerName}*, mengingatkan sisa catatan kasbon Anda di Toko KasirIn sebesar *Rp {debt.RemainingDebt:N0}*. Mohon konfirmasi kelunasannya ya. Terima kasih! 🙏";
+        var encodedMessage = Uri.EscapeDataString(message);
+        var waUrl = $"https://wa.me/{cleanPhone}?text={encodedMessage}";
+        await JSRuntime.InvokeVoidAsync("open", waUrl, "_blank");
     }
 
     private class DebtFormModel
