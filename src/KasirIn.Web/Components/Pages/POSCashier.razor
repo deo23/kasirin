@@ -1,4 +1,5 @@
 @page "/pos"
+@rendermode InteractiveServer
 @inject KasirInApiService ApiService
 @inject IJSRuntime JSRuntime
 
@@ -29,7 +30,7 @@
             <div class="flex gap-2 overflow-x-auto no-scrollbar py-0.5">
                 @foreach (var cat in _categories)
                 {
-                    <button class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 @(cat == _selectedCategory ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container text-on-surface border border-outline-variant hover:bg-surface-container-highest")"
+                    <button type="button" class="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer @(cat == _selectedCategory ? "bg-primary text-white shadow-sm" : "bg-surface-container text-on-surface border border-outline-variant hover:bg-surface-container-highest")"
                             @onclick="() => SelectCategory(cat)">
                         @cat
                     </button>
