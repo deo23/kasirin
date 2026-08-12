@@ -4,7 +4,7 @@
     --primary-hover: #003ea8;
     --primary-container: #2563eb;
     --on-primary: #ffffff;
-    --on-primary-container: #eeefff;
+    --on-primary-container: #ffffff;
     --surface: #f8f9ff;
     --surface-bright: #f8f9ff;
     --surface-container-lowest: #ffffff;
@@ -25,6 +25,62 @@
     --error: #dc2626;
     --error-container: #ffdad6;
     --on-error-container: #93000a;
+}
+
+/* High Contrast White Text Rules for Buttons & Blue Backgrounds */
+.bg-primary,
+.bg-primary-hover,
+.bg-primary-container,
+.bg-blue-500,
+.bg-blue-600,
+.bg-blue-700,
+.bg-\[\#004ac6\],
+.bg-\[\#2563eb\],
+.btn-primary {
+    color: #ffffff !important;
+}
+
+.bg-primary *,
+.bg-primary-hover *,
+.bg-primary-container *,
+.bg-blue-500 *,
+.bg-blue-600 *,
+.bg-blue-700 *,
+.bg-\[\#004ac6\] *,
+.bg-\[\#2563eb\] *,
+.btn-primary * {
+    color: #ffffff !important;
+}
+
+/* Button Clicked / Active / Focused State Text Contrast Fix */
+button.bg-primary:active,
+button.bg-primary:focus,
+button.bg-primary:hover,
+button.bg-primary-container:active,
+button.bg-primary-container:focus,
+button.bg-primary-container:hover,
+a.bg-primary:active,
+a.bg-primary:focus,
+a.bg-primary:hover,
+a.bg-primary-container:active,
+a.bg-primary-container:focus,
+a.bg-primary-container:hover {
+    color: #ffffff !important;
+}
+
+button.bg-primary:active *,
+button.bg-primary:focus *,
+button.bg-primary:hover *,
+button.bg-primary-container:active *,
+button.bg-primary-container:focus *,
+button.bg-primary-container:hover *,
+a.bg-primary:active *,
+a.bg-primary:focus *,
+a.bg-primary:hover *,
+a.bg-primary-container:active *,
+a.bg-primary-container:focus *,
+a.bg-primary-container:hover * {
+    color: #ffffff !important;
 }
 
 body {
