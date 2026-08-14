@@ -10,20 +10,27 @@
     <div class="flex-1 flex flex-col bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-sm overflow-hidden min-w-0">
         <!-- Search & Filter Header -->
         <div class="p-4 border-b border-outline-variant bg-surface flex flex-col gap-3">
-            <div class="relative w-full">
-                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px]">search</span>
-                <input type="text"
-                       class="w-full pl-11 pr-10 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder:text-on-surface-variant"
-                       placeholder="Cari produk berdasarkan nama atau SKU..."
-                       @bind="_searchTerm"
-                       @bind:event="oninput"
-                       @onkeyup="FilterProducts" />
-                @if (!string.IsNullOrEmpty(_searchTerm))
-                {
-                    <button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface" @onclick="ClearSearch">
-                        <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
-                }
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px]">search</span>
+                    <input type="text"
+                           class="w-full pl-11 pr-10 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder:text-on-surface-variant"
+                           placeholder="Cari produk berdasarkan nama atau SKU..."
+                           @bind="_searchTerm"
+                           @bind:event="oninput"
+                           @onkeyup="FilterProducts" />
+                    @if (!string.IsNullOrEmpty(_searchTerm))
+                    {
+                        <button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface" @onclick="ClearSearch">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    }
+                </div>
+                <button type="button" class="px-3.5 py-2.5 bg-primary text-white font-extrabold rounded-xl text-xs flex items-center gap-1.5 hover:bg-primary-hover shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+                        @onclick="OpenScannerModal">
+                    <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                    <span class="hidden sm:inline">Scan Kamera</span>
+                </button>
             </div>
 
             <!-- Quick Category Filters -->
@@ -318,6 +325,44 @@
     </div>
 }
 
+<!-- Modal Scanner Barcode Kamera -->
+@if (_showScannerModal)
+{
+    <div class="fixed inset-0 bg-on-surface/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div class="bg-surface-container-lowest rounded-2xl max-w-md w-full p-6 shadow-2xl border border-outline-variant flex flex-col gap-4">
+            <div class="flex justify-between items-center pb-3 border-b border-outline-variant">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-2xl">photo_camera</span>
+                    <h3 class="text-base font-extrabold text-on-surface">Scan Barcode Produk</h3>
+                </div>
+                <button type="button" class="text-on-surface-variant hover:text-on-surface p-1" @onclick="CloseScannerModal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="text-xs text-on-surface-variant">Arahkan kamera ke barcode kemasan barang (misal: SKU <code class="bg-surface-container px-1 py-0.5 rounded font-mono font-bold">SNK-001</code>). Audio beep akan berbunyi saat berhasil terdeteksi.</div>
+
+            <!-- Viewport Kamera JS Interop html5-qrcode -->
+            <div id="barcode-scanner-viewport" class="w-full h-64 bg-black rounded-xl overflow-hidden shadow-inner flex items-center justify-center border border-outline-variant">
+                <div class="text-white text-xs animate-pulse">Mengaktifkan modul kamera...</div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_scanErrorText))
+            {
+                <div class="p-3 bg-error-container text-on-error-container text-xs rounded-xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">error</span> @_scanErrorText
+                </div>
+            }
+
+            <div class="flex justify-end pt-2">
+                <button type="button" class="px-5 py-2.5 bg-surface-container border border-outline-variant text-on-surface rounded-xl font-extrabold text-xs hover:bg-surface-container-high transition-colors" @onclick="CloseScannerModal">
+                    Tutup Scanner
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private List<ProductDto> _products = new();
     private List<ProductDto> _filteredProducts = new();
@@ -340,6 +385,50 @@
     // Receipt Modal State
     private bool _showReceiptModal = false;
     private TransactionDto? _lastReceipt = null;
+
+    // Scanner Modal State
+    private bool _showScannerModal = false;
+    private string _scanErrorText = string.Empty;
+    private DotNetObjectReference<POSCashier>? _dotNetRef;
+
+    private async Task OpenScannerModal()
+    {
+        _scanErrorText = string.Empty;
+        _showScannerModal = true;
+        StateHasChanged();
+        await Task.Delay(200);
+        _dotNetRef ??= DotNetObjectReference.Create(this);
+        await JSRuntime.InvokeVoidAsync("KasirInScanner.startScan", _dotNetRef, "barcode-scanner-viewport");
+    }
+
+    private async Task CloseScannerModal()
+    {
+        _showScannerModal = false;
+        await JSRuntime.InvokeVoidAsync("KasirInScanner.stopScan");
+    }
+
+    [JSInvokable]
+    public async Task OnBarcodeScanned(string barcode)
+    {
+        if (string.IsNullOrWhiteSpace(barcode)) return;
+
+        var matchedProduct = _products.FirstOrDefault(p =>
+            p.SKU.Equals(barcode.Trim(), StringComparison.OrdinalIgnoreCase) ||
+            p.Name.Contains(barcode.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (matchedProduct != null)
+        {
+            AddToCart(matchedProduct);
+            _scanErrorText = string.Empty;
+            await CloseScannerModal();
+            await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            _scanErrorText = $"Barang dengan barcode '{barcode}' tidak ditemukan dalam katalog.";
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     private decimal CartSubTotal => _cartItems.Sum(i => i.SubTotal);
     private decimal CartDiscountAmount => _discountType == "%" ? CartSubTotal * (Math.Clamp(_discountValue, 0, 100) / 100m) : Math.Clamp(_discountValue, 0, CartSubTotal);
