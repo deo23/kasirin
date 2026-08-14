@@ -10,10 +10,10 @@
     <div class="flex justify-between items-center">
         <div>
             <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Overview Dashboard</h2>
-            <p class="text-xs text-on-surface-variant font-medium mt-0.5">Ringkasan performa penjualan harian toko Anda.</p>
+            <p class="text-xs text-on-surface-variant font-medium mt-0.5">Summary of daily sales performance for your store.</p>
         </div>
         <p class="text-xs font-bold text-primary bg-primary-container text-on-primary-container px-3 py-1.5 rounded-full shadow-xs">
-            Hari ini, @DateTime.Now.ToString("dd MMM yyyy")
+            Today, @DateTime.Now.ToString("dd MMM yyyy")
         </p>
     </div>
 
@@ -22,39 +22,39 @@
         <!-- Sales Card -->
         <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-primary flex flex-col gap-1.5 relative overflow-hidden">
             <div class="flex justify-between items-start">
-                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Penjualan Hari Ini</p>
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Today's Sales Revenue</p>
                 <span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-1.5 text-[20px]">payments</span>
             </div>
             <h3 class="text-2xl font-extrabold text-on-surface tabular-nums">Rp @_report.TotalRevenue.ToString("N0")</h3>
             <p class="text-xs font-bold text-primary flex items-center gap-1 mt-0.5">
                 <span class="material-symbols-outlined text-[16px]">trending_up</span>
-                +12.5% dibanding kemarin
+                +12.5% vs yesterday
             </p>
         </div>
 
         <!-- Profit Card -->
         <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-success flex flex-col gap-1.5">
             <div class="flex justify-between items-start">
-                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Keuntungan (Net Profit)</p>
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Net Profit</p>
                 <span class="material-symbols-outlined text-success bg-success-container rounded-full p-1.5 text-[20px]">account_balance_wallet</span>
             </div>
             <h3 class="text-2xl font-extrabold text-on-surface tabular-nums">Rp @_report.NetProfit.ToString("N0")</h3>
             <p class="text-xs font-bold text-success flex items-center gap-1 mt-0.5">
                 <span class="material-symbols-outlined text-[16px]">trending_up</span>
-                +8.2% dibanding kemarin
+                +8.2% vs yesterday
             </p>
         </div>
 
         <!-- Transactions Card -->
         <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-warning flex flex-col gap-1.5">
             <div class="flex justify-between items-start">
-                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Transaksi</p>
+                <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Sales Count</p>
                 <span class="material-symbols-outlined text-on-warning-container bg-warning-container rounded-full p-1.5 text-[20px]">receipt_long</span>
             </div>
-            <h3 class="text-2xl font-extrabold text-on-surface tabular-nums">@_report.TotalTransactions Transaksi</h3>
+            <h3 class="text-2xl font-extrabold text-on-surface tabular-nums">@_report.TotalTransactions Sales</h3>
             <p class="text-xs font-bold text-on-surface-variant flex items-center gap-1 mt-0.5">
                 <span class="material-symbols-outlined text-[16px]">horizontal_rule</span>
-                Volume stabil
+                Stable volume
             </p>
         </div>
     </div>
@@ -64,9 +64,9 @@
         <!-- Sales Trend Visual Chart (Spans 2 Columns) -->
         <div class="lg:col-span-2 bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs p-5 flex flex-col h-[380px]">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-on-surface">Tren Penjualan Mingguan</h3>
+                <h3 class="text-base font-bold text-on-surface">Weekly Sales Trend</h3>
                 <a href="reports" class="text-xs font-bold text-primary hover:underline flex items-center gap-0.5">
-                    Detail Laporan <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                    Report Details <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </a>
             </div>
 
@@ -104,7 +104,7 @@
             </div>
 
             <div class="flex justify-between mt-2.5 text-xs font-semibold text-on-surface-variant px-2">
-                <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span class="font-extrabold text-primary">Sab (Hari Ini)</span><span>Ming</span>
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span class="font-extrabold text-primary">Sat (Today)</span><span>Sun</span>
             </div>
         </div>
 
@@ -113,13 +113,13 @@
             <div>
                 <div class="flex items-center gap-2 mb-3">
                     <span class="material-symbols-outlined text-error">warning</span>
-                    <h3 class="text-base font-bold text-on-surface">Peringatan Stok Nipis</h3>
+                    <h3 class="text-base font-bold text-on-surface">Low Stock Warning</h3>
                 </div>
 
                 <ul class="flex flex-col gap-2.5">
                     @if (_lowStockProducts.Count == 0)
                     {
-                        <li class="p-3 text-center text-xs text-on-surface-variant bg-surface rounded-xl">Semua stok produk mencukupi!</li>
+                        <li class="p-3 text-center text-xs text-on-surface-variant bg-surface rounded-xl">All product stocks are sufficient!</li>
                     }
                     else
                     {
@@ -138,7 +138,7 @@
             </div>
 
             <a href="inventory" class="w-full mt-4 text-xs font-bold text-primary border border-primary hover:bg-primary hover:text-on-primary py-2.5 rounded-xl transition-colors text-center block">
-                Restok Barang
+                Restock Inventory
             </a>
         </div>
     </div>
@@ -146,9 +146,9 @@
     <!-- Recent Transactions Table -->
     <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs overflow-hidden flex flex-col">
         <div class="p-5 border-b border-outline-variant flex justify-between items-center bg-surface">
-            <h3 class="text-base font-bold text-on-surface">Transaksi Terakhir</h3>
+            <h3 class="text-base font-bold text-on-surface">Recent Transactions</h3>
             <a href="pos" class="text-xs font-bold text-primary hover:underline flex items-center gap-0.5">
-                POS Kasir <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                POS Cashier <span class="material-symbols-outlined text-[16px]">chevron_right</span>
             </a>
         </div>
 
@@ -156,11 +156,11 @@
             <table class="w-full text-left border-collapse">
                 <thead class="bg-surface border-b border-outline-variant text-xs text-on-surface-variant font-bold uppercase tracking-wider">
                     <tr>
-                        <th class="py-3 px-4">Waktu</th>
-                        <th class="py-3 px-4">No. Struk</th>
-                        <th class="py-3 px-4">Item Terjual</th>
-                        <th class="py-3 px-4">Metode</th>
-                        <th class="py-3 px-4 text-right">Total Transaksi</th>
+                        <th class="py-3 px-4">Time</th>
+                        <th class="py-3 px-4">Invoice #</th>
+                        <th class="py-3 px-4">Items Sold</th>
+                        <th class="py-3 px-4">Method</th>
+                        <th class="py-3 px-4 text-right">Total Amount</th>
                         <th class="py-3 px-4 text-center">Status</th>
                     </tr>
                 </thead>
@@ -168,7 +168,7 @@
                     @if (_recentTransactions.Count == 0)
                     {
                         <tr>
-                            <td colspan="6" class="py-6 text-center text-on-surface-variant">Belum ada transaksi hari ini.</td>
+                            <td colspan="6" class="py-6 text-center text-on-surface-variant">No transactions today yet.</td>
                         </tr>
                     }
                     else
@@ -178,11 +178,11 @@
                             <tr class="hover:bg-surface-container-low transition-colors">
                                 <td class="py-3 px-4 text-on-surface-variant">@trx.TransactionDate.ToString("HH:mm")</td>
                                 <td class="py-3 px-4 font-mono font-bold text-on-surface">@trx.InvoiceNumber</td>
-                                <td class="py-3 px-4 text-on-surface">@(trx.Items.Count > 0 ? $"{trx.Items.Count} item" : "1 item")</td>
+                                <td class="py-3 px-4 text-on-surface">@(trx.Items.Count > 0 ? $"{trx.Items.Count} items" : "1 item")</td>
                                 <td class="py-3 px-4 font-bold text-on-surface-variant">@trx.PaymentMethod</td>
                                 <td class="py-3 px-4 text-right font-mono font-bold text-primary">Rp @trx.TotalAmount.ToString("N0")</td>
                                 <td class="py-3 px-4 text-center">
-                                    <span class="bg-success-container text-on-success-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Lunas</span>
+                                    <span class="bg-success-container text-on-success-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Paid</span>
                                 </td>
                             </tr>
                         }

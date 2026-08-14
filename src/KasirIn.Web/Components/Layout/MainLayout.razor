@@ -25,11 +25,11 @@
                 <div class="flex items-center gap-1.5 bg-surface-container border border-outline-variant rounded-full p-1 text-xs shadow-inner">
                     <button type="button" class="px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer @(UserSession.IsOwner ? "bg-primary text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface")"
                             @onclick='() => SwitchPersona("OWNER")'>
-                        Pemilik (Owner)
+                        Store Owner
                     </button>
                     <button type="button" class="px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer @(UserSession.IsCashier ? "bg-primary text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface")"
                             @onclick='() => SwitchPersona("CASHIER")'>
-                        Kasir
+                        Cashier Staff
                     </button>
                 </div>
 
@@ -37,10 +37,10 @@
 
                 <div class="flex items-center gap-2 p-1.5 px-3 bg-surface-container-lowest rounded-full border border-outline-variant shadow-sm">
                     <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center font-extrabold text-xs shadow-xs">
-                        @(UserSession.IsOwner ? "OW" : "KS")
+                        @(UserSession.IsOwner ? "OW" : "CS")
                     </div>
                     <span class="text-xs font-extrabold text-on-surface hidden sm:inline">
-                        @(UserSession.IsOwner ? "Pemilik Toko" : "Kasir Operasional")
+                        @(UserSession.IsOwner ? "Store Owner" : "Cashier Staff")
                     </span>
                 </div>
             </div>

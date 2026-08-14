@@ -3,35 +3,35 @@
 @inject KasirInApiService ApiService
 @inject IJSRuntime JSRuntime
 
-<PageTitle>KasirIn - Laporan Keuangan & Kasbon</PageTitle>
+<PageTitle>KasirIn - Financial Reports & Ledger</PageTitle>
 
 <div class="flex flex-col gap-6 max-w-[1440px] mx-auto w-full">
     <!-- Header Title & Date Range Picker -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Laporan Keuangan & Analisis Profit</h2>
-            <p class="text-xs text-on-surface-variant font-medium mt-0.5">Rekapitulasi performa omset, HPP (modal), net profit, dan buku utang/kasbon pelanggan.</p>
+            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Financial Reports & Profit Analysis</h2>
+            <p class="text-xs text-on-surface-variant font-medium mt-0.5">Summary of gross revenue, cost price (COGS), net profit, and customer debt ledger.</p>
         </div>
 
         <div class="flex items-center gap-2">
             <!-- Filter Tanggal -->
             <div class="flex bg-surface-container-low p-1 rounded-xl border border-outline-variant shadow-xs">
                 <button class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors @(_dateRange == "Today" ? "bg-surface text-primary border border-outline-variant shadow-xs" : "text-on-surface-variant hover:bg-surface-container-high")"
-                        @onclick='() => ChangeDateRange("Today")'>Hari Ini</button>
+                        @onclick='() => ChangeDateRange("Today")'>Today</button>
                 <button class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors @(_dateRange == "Week" ? "bg-surface text-primary border border-outline-variant shadow-xs" : "text-on-surface-variant hover:bg-surface-container-high")"
-                        @onclick='() => ChangeDateRange("Week")'>Minggu Ini</button>
+                        @onclick='() => ChangeDateRange("Week")'>This Week</button>
                 <button class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors @(_dateRange == "Month" ? "bg-surface text-primary border border-outline-variant shadow-xs" : "text-on-surface-variant hover:bg-surface-container-high")"
-                        @onclick='() => ChangeDateRange("Month")'>Bulan Ini</button>
+                        @onclick='() => ChangeDateRange("Month")'>This Month</button>
             </div>
             <button type="button" class="px-4 py-2 bg-[#107C41] text-white rounded-xl font-extrabold text-xs flex items-center gap-1.5 hover:bg-[#0b5c30] transition-colors shadow-xs cursor-pointer disabled:opacity-50"
                     disabled="@_isExportingExcel"
                     @onclick="DownloadExcelReport">
                 <span class="material-symbols-outlined text-[18px]">download</span>
-                @(_isExportingExcel ? "Mengunduh..." : "Export Excel (.xlsx)")
+                @(_isExportingExcel ? "Downloading..." : "Export Excel (.xlsx)")
             </button>
             <button type="button" class="px-4 py-2 bg-primary text-white rounded-xl font-extrabold text-xs flex items-center gap-1.5 hover:bg-primary-hover transition-colors shadow-xs cursor-pointer"
                     @onclick="OpenDebtModal">
-                <span class="material-symbols-outlined text-[18px]">menu_book</span> Catat Kasbon
+                <span class="material-symbols-outlined text-[18px]">menu_book</span> Record Debt
             </button>
         </div>
     </div>
@@ -42,7 +42,7 @@
         <div class="bg-surface-container-lowest rounded-xl p-5 shadow-xs border border-outline-variant relative overflow-hidden flex flex-col justify-between h-[130px]">
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-success"></div>
             <div class="flex justify-between items-start">
-                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Net Profit (Keuntungan Bersih)</span>
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Net Profit</span>
                 <div class="w-8 h-8 rounded-full bg-success-container flex items-center justify-center text-on-success-container">
                     <span class="material-symbols-outlined text-[18px]">trending_up</span>
                 </div>
@@ -51,7 +51,7 @@
                 <div class="text-2xl font-extrabold text-on-surface tabular-nums">Rp @_report.NetProfit.ToString("N0")</div>
                 <div class="text-xs font-bold text-success flex items-center mt-1">
                     <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
-                    <span class="ml-1">+8.2% dibanding periode lalu</span>
+                    <span class="ml-1">+8.2% vs previous period</span>
                 </div>
             </div>
         </div>
@@ -60,7 +60,7 @@
         <div class="bg-surface-container-lowest rounded-xl p-5 shadow-xs border border-outline-variant relative overflow-hidden flex flex-col justify-between h-[130px]">
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
             <div class="flex justify-between items-start">
-                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Gross Revenue (Omset Kotor)</span>
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Gross Revenue</span>
                 <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
                     <span class="material-symbols-outlined text-[18px]">payments</span>
                 </div>
@@ -69,7 +69,7 @@
                 <div class="text-2xl font-extrabold text-on-surface tabular-nums">Rp @_report.TotalRevenue.ToString("N0")</div>
                 <div class="text-xs font-bold text-success flex items-center mt-1">
                     <span class="material-symbols-outlined text-[14px]">arrow_upward</span>
-                    <span class="ml-1">+12.5% dibanding periode lalu</span>
+                    <span class="ml-1">+12.5% vs previous period</span>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
         <div class="bg-surface-container-lowest rounded-xl p-5 shadow-xs border border-outline-variant relative overflow-hidden flex flex-col justify-between h-[130px]">
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-warning"></div>
             <div class="flex justify-between items-start">
-                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Harga Modal (HPP)</span>
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Cost of Goods Sold (COGS)</span>
                 <div class="w-8 h-8 rounded-full bg-warning-container flex items-center justify-center text-on-warning-container">
                     <span class="material-symbols-outlined text-[18px]">receipt_long</span>
                 </div>
@@ -87,7 +87,7 @@
                 <div class="text-2xl font-extrabold text-on-surface tabular-nums">Rp @_report.TotalCogs.ToString("N0")</div>
                 <div class="text-xs font-bold text-on-surface-variant flex items-center mt-1">
                     <span class="material-symbols-outlined text-[14px]">info</span>
-                    <span class="ml-1">Biaya modal barang terjual</span>
+                    <span class="ml-1">Cost of sold inventory</span>
                 </div>
             </div>
         </div>
@@ -100,13 +100,13 @@
             <div class="p-5 border-b border-outline-variant bg-surface flex justify-between items-center">
                 <div>
                     <h3 class="text-base font-bold text-on-surface flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary">menu_book</span> Buku Kasbon & Utang Pelanggan
+                        <span class="material-symbols-outlined text-primary">menu_book</span> Customer Debt Ledger & Kasbon
                     </h3>
-                    <p class="text-xs text-on-surface-variant">Daftar saldo kasbon aktif pelanggan toko</p>
+                    <p class="text-xs text-on-surface-variant">Active credit balance list for store customers</p>
                 </div>
                 <button class="text-xs font-bold text-primary hover:bg-primary-container hover:text-on-primary-container px-3 py-1.5 rounded-lg transition-colors"
                         @onclick="OpenDebtModal">
-                    + Tambah Kasbon
+                    + Add Customer Debt
                 </button>
             </div>
 
@@ -114,20 +114,20 @@
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-surface border-b border-outline-variant text-xs text-on-surface-variant font-bold uppercase tracking-wider">
                         <tr>
-                            <th class="py-3 px-4">Nama Pelanggan</th>
-                            <th class="py-3 px-4">No. HP</th>
-                            <th class="py-3 px-4 text-right">Total Utang</th>
-                            <th class="py-3 px-4 text-right">Dibayar</th>
-                            <th class="py-3 px-4 text-right">Sisa Utang</th>
+                            <th class="py-3 px-4">Customer Name</th>
+                            <th class="py-3 px-4">Phone Number</th>
+                            <th class="py-3 px-4 text-right">Total Debt</th>
+                            <th class="py-3 px-4 text-right">Amount Paid</th>
+                            <th class="py-3 px-4 text-right">Remaining Debt</th>
                             <th class="py-3 px-4 text-center">Status</th>
-                            <th class="py-3 px-4 text-center">Aksi Tagihan</th>
+                            <th class="py-3 px-4 text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody class="text-xs divide-y divide-outline-variant">
                         @if (_debts.Count == 0)
                         {
                             <tr>
-                                <td colspan="7" class="py-6 text-center text-on-surface-variant">Belum ada catatan kasbon.</td>
+                                <td colspan="7" class="py-6 text-center text-on-surface-variant">No active debt records found.</td>
                             </tr>
                         }
                         else
@@ -143,19 +143,19 @@
                                     <td class="py-3 px-4 text-center">
                                         @if (debt.IsSettled)
                                         {
-                                            <span class="bg-success-container text-on-success-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Lunas</span>
+                                            <span class="bg-success-container text-on-success-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Paid Off</span>
                                         }
                                         else
                                         {
-                                            <span class="bg-error-container text-on-error-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Belum Lunas</span>
+                                            <span class="bg-error-container text-on-error-container px-2.5 py-0.5 rounded-full text-[10px] font-bold">Unpaid</span>
                                         }
                                     </td>
                                     <td class="py-3 px-4 text-center">
                                         @if (!debt.IsSettled && !string.IsNullOrWhiteSpace(debt.CustomerPhone))
                                         {
                                             <button type="button" class="inline-flex items-center gap-1.5 bg-[#25D366] text-white hover:bg-[#128C7E] px-3 py-1.5 rounded-xl font-bold text-[11px] transition-colors shadow-xs cursor-pointer"
-                                                    @onclick="() => SendWhatsAppReminder(debt)" title="Kirim Tagihan via WhatsApp">
-                                                <span class="material-symbols-outlined text-[14px]">send</span> Tagih WA
+                                                    @onclick="() => SendWhatsAppReminder(debt)" title="Send Invoice Reminder via WhatsApp">
+                                                <span class="material-symbols-outlined text-[14px]">send</span> Remind WA
                                             </button>
                                         }
                                         else
@@ -173,7 +173,7 @@
 
         <!-- Sales by Category Breakdown -->
         <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xs flex flex-col p-5">
-            <h3 class="text-base font-bold text-on-surface mb-4">Persentase Penjualan per Kategori</h3>
+            <h3 class="text-base font-bold text-on-surface mb-4">Sales Percentage by Category</h3>
             <div class="flex flex-col gap-4">
                 <div>
                     <div class="flex justify-between text-xs mb-1">
@@ -183,29 +183,29 @@
                     <div class="w-full bg-surface-container-high rounded-full h-2.5 overflow-hidden">
                         <div class="bg-primary h-full rounded-full" style="width: 45%"></div>
                     </div>
-                    <div class="text-[11px] font-mono text-on-surface-variant mt-1 text-right">Rp 1.912.500</div>
+                    <div class="text-[11px] font-mono text-on-surface-variant mt-1 text-right">Rp 1,912,500</div>
                 </div>
 
                 <div>
                     <div class="flex justify-between text-xs mb-1">
-                        <span class="font-bold text-on-surface">Snacks & Makanan</span>
+                        <span class="font-bold text-on-surface">Snacks & Foods</span>
                         <span class="text-on-surface-variant font-bold">30%</span>
                     </div>
                     <div class="w-full bg-surface-container-high rounded-full h-2.5 overflow-hidden">
                         <div class="bg-success h-full rounded-full" style="width: 30%"></div>
                     </div>
-                    <div class="text-[11px] font-mono text-on-surface-variant mt-1 text-right">Rp 1.275.000</div>
+                    <div class="text-[11px] font-mono text-on-surface-variant mt-1 text-right">Rp 1,275,000</div>
                 </div>
 
                 <div>
                     <div class="flex justify-between text-xs mb-1">
-                        <span class="font-bold text-on-surface">Groceries & Sembako</span>
+                        <span class="font-bold text-on-surface">Groceries & Household</span>
                         <span class="text-on-surface-variant font-bold">25%</span>
                     </div>
                     <div class="w-full bg-surface-container-high rounded-full h-2.5 overflow-hidden">
                         <div class="bg-warning h-full rounded-full" style="width: 25%"></div>
                     </div>
-                    <div class="text-[11px] font-mono text-on-surface-variant mt-1 text-right">Rp 1.062.500</div>
+                    <div class="text-[11px] font-mono text-on-surface-variant mt-1 text-right">Rp 1,062,500</div>
                 </div>
             </div>
         </div>
@@ -219,7 +219,7 @@
         <div class="bg-surface-container-lowest rounded-2xl max-w-md w-full p-6 shadow-2xl border border-outline-variant flex flex-col gap-4">
             <div class="flex justify-between items-center pb-3 border-b border-outline-variant">
                 <h3 class="text-base font-extrabold text-on-surface flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">menu_book</span> Catat Kasbon Pelanggan
+                    <span class="material-symbols-outlined text-primary">menu_book</span> Record Customer Debt
                 </h3>
                 <button class="text-on-surface-variant hover:text-on-surface" @onclick="CloseDebtModal">
                     <span class="material-symbols-outlined">close</span>
@@ -228,27 +228,27 @@
 
             <EditForm Model="_debtForm" OnValidSubmit="SaveDebtRecord" class="flex flex-col gap-3">
                 <div>
-                    <label class="text-xs font-bold text-on-surface-variant mb-1 block">Nama Pelanggan</label>
-                    <InputText @bind-Value="_debtForm.CustomerName" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" placeholder="Contoh: Pak Budi (Warung Pojok)" />
+                    <label class="text-xs font-bold text-on-surface-variant mb-1 block">Customer Name</label>
+                    <InputText @bind-Value="_debtForm.CustomerName" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" placeholder="e.g. Alexander Wright" />
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-on-surface-variant mb-1 block">Nomor HP</label>
-                    <InputText @bind-Value="_debtForm.CustomerPhone" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" placeholder="Contoh: 081234567890" />
+                    <label class="text-xs font-bold text-on-surface-variant mb-1 block">Phone Number</label>
+                    <InputText @bind-Value="_debtForm.CustomerPhone" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" placeholder="e.g. 081298765432" />
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Total Nominal Utang (Rp)</label>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Total Debt Amount (Rp)</label>
                         <InputNumber @bind-Value="_debtForm.TotalDebt" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" />
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Sudah Dibayar (Rp)</label>
+                        <label class="text-xs font-bold text-on-surface-variant mb-1 block">Amount Paid (Rp)</label>
                         <InputNumber @bind-Value="_debtForm.PaidDebt" class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-xl text-xs font-medium focus:ring-2 focus:ring-primary" />
                     </div>
                 </div>
 
                 <div class="flex gap-3 pt-3 border-t border-outline-variant mt-2">
-                    <button type="button" class="flex-1 py-2.5 bg-surface border border-outline-variant text-on-surface rounded-xl font-bold text-xs hover:bg-surface-container" @onclick="CloseDebtModal">Batal</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-xs hover:bg-primary-hover shadow-xs">Simpan Catatan</button>
+                    <button type="button" class="flex-1 py-2.5 bg-surface border border-outline-variant text-on-surface rounded-xl font-bold text-xs hover:bg-surface-container" @onclick="CloseDebtModal">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-primary text-on-primary rounded-xl font-bold text-xs hover:bg-primary-hover shadow-xs">Save Debt Record</button>
                 </div>
             </EditForm>
         </div>

@@ -27,18 +27,17 @@ public class KasirInApiService
     private readonly HttpClient _httpClient;
     public static readonly Guid DefaultTenantId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
-    // In-memory fallback dataset for seamless UI demo
+    // In-memory fallback dataset for seamless UI demo (100% English & Studio Photography)
     private static readonly List<ProductDto> _localProducts = new()
     {
         new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Beverages", Name = "Organic Dark Roast Whole Bean Coffee 500g", SKU = "BEV-101", CostPrice = 120000, SellingPrice = 185000, StockQuantity = 35, MinStockThreshold = 5, ImageUrl = "uploads/products/organic_coffee_beans.jpg" },
         new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Snacks", Name = "Artisanal 75% Single-Origin Dark Chocolate Bar", SKU = "SNK-102", CostPrice = 38000, SellingPrice = 65000, StockQuantity = 50, MinStockThreshold = 10, ImageUrl = "uploads/products/dark_chocolate_bar.jpg" },
         new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Groceries", Name = "Cold-Pressed Extra Virgin Olive Oil 750ml", SKU = "GRC-103", CostPrice = 135000, SellingPrice = 210000, StockQuantity = 22, MinStockThreshold = 5, ImageUrl = "uploads/products/olive_oil_bottle.jpg" },
         new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Drinks", Name = "Sparkling Natural Mineral Water 750ml", SKU = "DRK-104", CostPrice = 18000, SellingPrice = 35000, StockQuantity = 60, MinStockThreshold = 10, ImageUrl = "uploads/products/sparkling_mineral_water.jpg" },
-        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Snacks", Name = "Keripik Kentang Rasa Sapi Panggang 68g", SKU = "SNK-001", CostPrice = 9000, SellingPrice = 12500, StockQuantity = 45, MinStockThreshold = 5, ImageUrl = "https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=400" },
-        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Drinks", Name = "Air Mineral Botol 600ml", SKU = "DRK-001", CostPrice = 2500, SellingPrice = 4000, StockQuantity = 12, MinStockThreshold = 5, ImageUrl = "https://images.unsplash.com/photo-1560023907-5f339617ea30?w=400" },
-        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Snacks", Name = "Mie Instan Cup Rasa Kari Ayam", SKU = "SNK-002", CostPrice = 4500, SellingPrice = 6500, StockQuantity = 2, MinStockThreshold = 5, ImageUrl = "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=400", IsLowStock = true },
-        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Beverages", Name = "Kopi Kenangan Mantan 250g", SKU = "PRD-001", CostPrice = 15000, SellingPrice = 22000, StockQuantity = 45, MinStockThreshold = 5, ImageUrl = "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400" },
-        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Groceries", Name = "Beras Maknyus 5kg", SKU = "PRD-002", CostPrice = 60000, SellingPrice = 68500, StockQuantity = 3, MinStockThreshold = 5, ImageUrl = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400", IsLowStock = true }
+        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Groceries", Name = "Fresh Organic Hass Avocados (Pack of 4)", SKU = "GRC-105", CostPrice = 45000, SellingPrice = 75000, StockQuantity = 18, MinStockThreshold = 5, ImageUrl = "uploads/products/organic_avocados.jpg" },
+        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Drinks", Name = "Artisanal Sparkling Kombucha Ginger Lemon 330ml", SKU = "DRK-106", CostPrice = 22000, SellingPrice = 42000, StockQuantity = 4, MinStockThreshold = 5, ImageUrl = "uploads/products/sparkling_kombucha.jpg", IsLowStock = true },
+        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Snacks", Name = "Gourmet Whole Roasted Sea Salt Almonds 250g", SKU = "SNK-107", CostPrice = 55000, SellingPrice = 95000, StockQuantity = 40, MinStockThreshold = 8, ImageUrl = "uploads/products/roasted_almonds.jpg" },
+        new ProductDto { Id = Guid.NewGuid(), TenantId = DefaultTenantId, CategoryName = "Beverages", Name = "Premium Japanese Uji Matcha Green Tea Powder 200g", SKU = "BEV-108", CostPrice = 70000, SellingPrice = 125000, StockQuantity = 25, MinStockThreshold = 5, ImageUrl = "uploads/products/matcha_tea_powder.jpg" }
     };
 
     private static readonly List<TransactionDto> _localTransactions = new()
@@ -49,15 +48,15 @@ public class KasirInApiService
             TenantId = DefaultTenantId,
             InvoiceNumber = "TRX-0982",
             TransactionDate = DateTime.Now.AddMinutes(-25),
-            TotalAmount = 125000,
-            PaidAmount = 130000,
+            TotalAmount = 395000,
+            PaidAmount = 400000,
             ChangeAmount = 5000,
             PaymentMethod = "CASH",
-            TotalProfit = 35000,
+            TotalProfit = 140000,
             Items = new List<TransactionItemDto>
             {
-                new TransactionItemDto { Id = Guid.NewGuid(), ProductName = "Beras Maknyus 5kg", Quantity = 1, UnitPrice = 68500, CostPrice = 60000, SubTotal = 68500, Profit = 8500 },
-                new TransactionItemDto { Id = Guid.NewGuid(), ProductName = "Kopi Kenangan Mantan 250g", Quantity = 2, UnitPrice = 22000, CostPrice = 15000, SubTotal = 44000, Profit = 14000 }
+                new TransactionItemDto { Id = Guid.NewGuid(), ProductName = "Organic Dark Roast Whole Bean Coffee 500g", Quantity = 1, UnitPrice = 185000, CostPrice = 120000, SubTotal = 185000, Profit = 65000 },
+                new TransactionItemDto { Id = Guid.NewGuid(), ProductName = "Cold-Pressed Extra Virgin Olive Oil 750ml", Quantity = 1, UnitPrice = 210000, CostPrice = 135000, SubTotal = 210000, Profit = 75000 }
             }
         },
         new TransactionDto
@@ -66,38 +65,42 @@ public class KasirInApiService
             TenantId = DefaultTenantId,
             InvoiceNumber = "TRX-0981",
             TransactionDate = DateTime.Now.AddMinutes(-45),
-            TotalAmount = 15000,
-            PaidAmount = 20000,
-            ChangeAmount = 5000,
+            TotalAmount = 140000,
+            PaidAmount = 150000,
+            ChangeAmount = 10000,
             PaymentMethod = "QRIS",
-            TotalProfit = 4000,
+            TotalProfit = 55000,
             Items = new List<TransactionItemDto>
             {
-                new TransactionItemDto { Id = Guid.NewGuid(), ProductName = "Keripik Kentang Rasa Sapi Panggang 68g", Quantity = 1, UnitPrice = 12500, CostPrice = 9000, SubTotal = 12500, Profit = 3500 }
+                new TransactionItemDto { Id = Guid.NewGuid(), ProductName = "Artisanal 75% Single-Origin Dark Chocolate Bar", Quantity = 1, UnitPrice = 65000, CostPrice = 38000, SubTotal = 65000, Profit = 27000 },
+                new TransactionItemDto { Id = Guid.NewGuid(), ProductName = "Fresh Organic Hass Avocados (Pack of 4)", Quantity = 1, UnitPrice = 75000, CostPrice = 45000, SubTotal = 75000, Profit = 30000 }
             }
-        },
-        new TransactionDto
-        {
-            Id = Guid.NewGuid(),
-            TenantId = DefaultTenantId,
-            InvoiceNumber = "TRX-0980",
-            TransactionDate = DateTime.Now.AddHours(-2),
-            TotalAmount = 450000,
-            PaidAmount = 450000,
-            ChangeAmount = 0,
-            PaymentMethod = "TRANSFER",
-            TotalProfit = 95000,
-            Items = new List<TransactionItemDto>()
         }
     };
 
     private static readonly List<CustomerDebtDto> _localDebts = new()
     {
-        new CustomerDebtDto { CustomerName = "Pak Budi (Warung Pojok)", CustomerPhone = "081234567890", TotalDebt = 350000, PaidDebt = 100000, CreatedAt = DateTime.Now.AddDays(-5), DueDate = DateTime.Now.AddDays(10) },
-        new CustomerDebtDto { CustomerName = "Ibu Ani", CustomerPhone = "089876543210", TotalDebt = 120000, PaidDebt = 0, CreatedAt = DateTime.Now.AddDays(-2), DueDate = DateTime.Now.AddDays(5) }
+        new CustomerDebtDto
+        {
+            Id = Guid.NewGuid(),
+            CustomerName = "Alexander Wright",
+            CustomerPhone = "081298765432",
+            TotalDebt = 250000,
+            PaidDebt = 50000,
+            DueDate = DateTime.Now.AddDays(7)
+        },
+        new CustomerDebtDto
+        {
+            Id = Guid.NewGuid(),
+            CustomerName = "Sophia Martinez",
+            CustomerPhone = "081345678901",
+            TotalDebt = 180000,
+            PaidDebt = 180000,
+            DueDate = DateTime.Now.AddDays(-2)
+        }
     };
 
-    public KasirInApiService(HttpClient httpClient, bool dummy = false)
+    public KasirInApiService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }

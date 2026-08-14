@@ -8,7 +8,7 @@
             K
         </div>
         <div>
-            <h1 class="text-lg font-extrabold text-primary leading-tight">Toko Maju Jaya</h1>
+            <h1 class="text-lg font-extrabold text-primary leading-tight">Global Mart POS</h1>
             <p class="text-xs text-on-surface-variant font-medium">KasirIn Cloud POS</p>
         </div>
     </div>
@@ -16,7 +16,7 @@
     <!-- CTA Button -->
     <a href="/pos" class="mb-6 w-full bg-primary text-white py-3 px-4 rounded-xl font-extrabold flex items-center justify-center gap-2 hover:bg-primary-hover transition-colors shadow-xs text-sm">
         <span class="material-symbols-outlined text-[20px]">add</span>
-        Transaksi Baru
+        New Sale
     </a>
 
     <!-- Navigation Menu Items -->
@@ -33,13 +33,13 @@
         <li>
             <NavLink class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-xl font-medium text-sm" href="pos" ActiveClass="bg-primary text-white font-bold shadow-sm">
                 <span class="material-symbols-outlined text-[22px]">point_of_sale</span>
-                <span>POS Kasir</span>
+                <span>POS Cashier</span>
             </NavLink>
         </li>
         <li>
             <NavLink class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-xl font-medium text-sm" href="inventory" ActiveClass="bg-primary text-white font-bold shadow-sm">
                 <span class="material-symbols-outlined text-[22px]">inventory_2</span>
-                <span>Manajemen Stok</span>
+                <span>Inventory Master</span>
             </NavLink>
         </li>
         @if (UserSession.IsOwner)
@@ -47,7 +47,7 @@
             <li>
                 <NavLink class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-xl font-medium text-sm" href="reports" ActiveClass="bg-primary text-white font-bold shadow-sm">
                     <span class="material-symbols-outlined text-[22px]">assessment</span>
-                    <span>Laporan Keuangan</span>
+                    <span>Financial Reports</span>
                 </NavLink>
             </li>
         }
@@ -58,8 +58,8 @@
         <div class="flex items-center gap-3 px-3 py-2 text-on-surface-variant text-sm font-medium">
             <span class="material-symbols-outlined text-[20px]">person</span>
             <div class="flex flex-col">
-                <span class="text-xs font-bold text-on-surface">@(UserSession.IsOwner ? "Pemilik Toko" : "Kasir Operasional")</span>
-                <span class="text-[10px] text-on-surface-variant">@(UserSession.IsOwner ? "owner@kasirin.app" : "kasir@kasirin.app")</span>
+                <span class="text-xs font-bold text-on-surface">@(UserSession.IsOwner ? "Store Owner" : "Cashier Staff")</span>
+                <span class="text-[10px] text-on-surface-variant">@(UserSession.IsOwner ? "owner@kasirin.app" : "cashier@kasirin.app")</span>
             </div>
         </div>
     </div>
