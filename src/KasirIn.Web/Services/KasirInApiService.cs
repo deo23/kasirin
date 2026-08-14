@@ -487,26 +487,34 @@ public class KasirInApiService
 
     public async Task<List<ProductDto>> GetProductsAsync(string? category = null, string? search = null)
     {
+        List<ProductDto> list = new();
         try
         {
             var url = $"api/Products?tenantId={DefaultTenantId}";
             if (!string.IsNullOrEmpty(category)) url += $"&categoryId={category}";
             var result = await _httpClient.GetFromJsonAsync<List<ProductDto>>(url);
-            return result ?? _localProducts;
+            if (result != null && result.Count > 0)
+            {
+                list = result;
+            }
         }
-        catch
+        catch { }
+
+        if (list.Count == 0)
         {
-            var query = _localProducts.AsQueryable();
-            if (!string.IsNullOrEmpty(category) && category != "Semua" && category != "All")
-            {
-                query = query.Where(p => p.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase));
-            }
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || p.SKU.Contains(search, StringComparison.OrdinalIgnoreCase));
-            }
-            return query.ToList();
+            list = _localProducts;
         }
+
+        var query = list.AsQueryable();
+        if (!string.IsNullOrEmpty(category) && category != "Semua" && category != "All")
+        {
+            query = query.Where(p => p.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase));
+        }
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || p.SKU.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+        return query.ToList();
     }
 
     public async Task<Guid> CreateProductAsync(CreateProductCommand command)
