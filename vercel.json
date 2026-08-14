@@ -1,6 +1,8 @@
 {
   "version": 2,
   "name": "kasirin-pos",
+  "public": true,
+  "cleanUrls": true,
   "builds": [
     {
       "src": "src/KasirIn.Web/wwwroot/**",
