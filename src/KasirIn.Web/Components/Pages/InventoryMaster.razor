@@ -129,7 +129,7 @@
                                     <div class="flex items-center gap-2.5">
                                         @if (!string.IsNullOrEmpty(prod.ImageUrl))
                                         {
-                                            <img src="@prod.ImageUrl" alt="@prod.Name" class="w-8 h-8 rounded-lg object-cover border border-outline-variant" />
+                                            <img src="@prod.ImageUrl" alt="@prod.Name" onerror="this.onerror=null;this.src='uploads/products/organic_coffee_beans.jpg';" class="w-8 h-8 rounded-lg object-cover border border-outline-variant" />
                                         }
                                         <span>@prod.Name</span>
                                     </div>
