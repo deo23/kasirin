@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KasirIn - Smart Cloud POS System</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#004ac6",
+                        "primary-hover": "#1d4ed8",
+                        surface: "#f8f9ff",
+                        "on-surface": "#0b1c30"
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#f8f9ff] text-[#0b1c30] font-sans antialiased min-h-screen flex flex-col justify-between">
+    <!-- Header Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="images/kasirin-logo.svg" alt="KasirIn POS Logo" class="h-10 w-auto" />
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    Live Cloud Service Online
+                </span>
+                <a href="https://github.com/deo23/kasirin" target="_blank" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub Source
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Showcase Section -->
+    <main class="max-w-7xl mx-auto px-6 py-12 w-full flex-grow flex flex-col gap-10">
+        <div class="text-center max-w-3xl mx-auto space-y-4">
+            <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3.5 py-1.5 rounded-full text-xs font-extrabold border border-blue-200">
+                <span class="material-symbols-outlined text-sm">rocket_launch</span>
+                KasirIn .NET 8 Enterprise POS Suite
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+                Modern Cloud Point of Sale & Financial Management
+            </h1>
+            <p class="text-base text-slate-600 font-medium leading-relaxed">
+                KasirIn is a high-performance C# .NET 8 Blazor Server application featuring 95+ realistic retail products, thermal receipts, live camera barcode scanning, financial reporting, and dual-role RBAC persona switching.
+            </p>
+        </div>
+
+        <!-- Live Deployment Info Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col gap-3 border-t-4 border-t-blue-600">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">95+ Real Products Catalog</h3>
+                <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                    Pre-populated with 8 retail categories (Beverages, Snacks, Groceries, Bakery, Personal Care, Household, Health & Wellness) with studio photography.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col gap-3 border-t-4 border-t-emerald-600">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined">qr_code_scanner</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">Live Camera Barcode Scanner</h3>
+                <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                    Integrated device camera scanner using HTML5 QR/Barcode SDK for real-time item lookup and quick POS cashier scanning.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col gap-3 border-t-4 border-t-amber-600">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined">analytics</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">Analytics & Excel Export</h3>
+                <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                    Real-time revenue metrics, profit reports, debt ledger tracking, and instant Excel (.xlsx) report generation.
+                </p>
+            </div>
+        </div>
+
+        <!-- Local Server Connection Box -->
+        <div class="bg-slate-900 text-white rounded-3xl p-8 border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-left">
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-400">computer</span>
+                    Local Host Development Server Active
+                </h2>
+                <p class="text-xs text-slate-400 font-medium">
+                    KasirIn ASP.NET Core & Blazor WebApp is currently running live on your local environment:
+                </p>
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <a href="http://localhost:5200" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-white"></span>
+                        Open WebApp (http://localhost:5200)
+                    </a>
+                    <a href="http://localhost:5000/swagger" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition-colors">
+                        Open REST API Swagger (http://localhost:5000)
+                    </a>
+                </div>
+            </div>
+            <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/60 text-xs font-mono text-slate-300 space-y-1.5 w-full md:w-80">
+                <div class="flex justify-between"><span class="text-slate-400">Platform:</span> <span>.NET 8 Blazor</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Database:</span> <span>EF Core In-Memory</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Architecture:</span> <span>Clean CQRS</span></div>
+                <div class="flex justify-between"><span class="text-slate-400">Status:</span> <span class="text-emerald-400 font-bold">● Running</span></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 font-medium">
+        &copy; 2026 KasirIn Cloud POS Suite. All rights reserved. Powered by .NET 8 Blazor & Google Stitch Theme.
+    </footer>
+</body>
+</html>

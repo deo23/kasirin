@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <linearGradient id="kasirin-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#004ac6" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="accent-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#kasirin-icon-grad)" />
+  <rect x="12" y="14" width="40" height="20" rx="6" fill="#ffffff" fill-opacity="0.95" />
+  <path d="M20 28 V24 M27 28 V20 M34 28 V25 M41 28 V19" stroke="#004ac6" stroke-width="3" stroke-linecap="round" />
+  <circle cx="18" cy="45" r="3" fill="#ffffff" />
+  <circle cx="28" cy="45" r="3" fill="#ffffff" />
+  <circle cx="38" cy="45" r="3" fill="#ffffff" />
+  <circle cx="47" cy="45" r="4.5" fill="url(#accent-icon-grad)" />
+  <path d="M45 45L46.5 46.5L49 44" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

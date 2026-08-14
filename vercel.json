@@ -1,18 +1,3 @@
 {
-  "version": 2,
-  "name": "kasirin-pos",
-  "public": true,
-  "cleanUrls": true,
-  "builds": [
-    {
-      "src": "src/KasirIn.Web/wwwroot/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "src/KasirIn.Web/wwwroot/$1"
-    }
-  ]
+  "outputDirectory": "public"
 }
