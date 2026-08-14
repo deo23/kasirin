@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en" class="h-full bg-[#f8f9ff]">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KasirIn - Smart Cloud POS System</title>
+    <title>KasirIn - Analytics Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,9 +16,28 @@
                 extend: {
                     colors: {
                         primary: "#004ac6",
-                        "primary-hover": "#1d4ed8",
+                        "primary-container": "#2563eb",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#eeefff",
                         surface: "#f8f9ff",
-                        "on-surface": "#0b1c30"
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-surface": "#0b1c30",
+                        "on-surface-variant": "#434655",
+                        outline: "#737686",
+                        "outline-variant": "#c3c6d7",
+                        success: "#16a34a",
+                        "success-container": "#dcfce7",
+                        "on-success-container": "#166534",
+                        warning: "#d97706",
+                        "warning-container": "#fef3c7",
+                        "on-warning-container": "#92400e",
+                        error: "#dc2626",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a"
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif']
@@ -28,106 +47,599 @@
         }
     </script>
 </head>
-<body class="bg-[#f8f9ff] text-[#0b1c30] font-sans antialiased min-h-screen flex flex-col justify-between">
-    <!-- Header Navigation Bar -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<body class="bg-[#f8f9ff] text-[#0b1c30] font-sans antialiased min-h-screen flex flex-col md:flex-row">
+
+    <!-- Sidebar Navigation -->
+    <nav class="hidden md:flex bg-white text-primary border-r border-outline-variant fixed left-0 top-0 h-full w-[280px] flex-col py-6 px-4 z-50 shadow-xs">
+        <!-- Brand Header Logo -->
+        <a href="#" onclick="switchTab('dashboard')" class="flex items-center gap-3 mb-6 px-2 group">
+            <img src="images/kasirin-logo.svg" alt="KasirIn POS" class="h-10 w-auto group-hover:scale-105 transition-transform" />
+        </a>
+
+        <!-- CTA Button -->
+        <button onclick="switchTab('pos')" class="mb-6 w-full bg-primary text-white py-3 px-4 rounded-xl font-extrabold flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors shadow-xs text-sm">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+            New Sale
+        </button>
+
+        <!-- Navigation Menu Items -->
+        <ul class="flex flex-col gap-1.5 flex-grow">
+            <li>
+                <button id="nav-dashboard" onclick="switchTab('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 bg-primary text-white font-bold rounded-xl text-sm text-left transition-all shadow-xs">
+                    <span class="material-symbols-outlined text-[22px]">dashboard</span>
+                    <span>Analytics Dashboard</span>
+                </button>
+            </li>
+            <li>
+                <button id="nav-pos" onclick="switchTab('pos')" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-xl font-medium text-sm text-left transition-all">
+                    <span class="material-symbols-outlined text-[22px]">point_of_sale</span>
+                    <span>POS Cashier</span>
+                </button>
+            </li>
+            <li>
+                <button id="nav-inventory" onclick="switchTab('inventory')" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-xl font-medium text-sm text-left transition-all">
+                    <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+                    <span>Inventory Master</span>
+                </button>
+            </li>
+            <li>
+                <button id="nav-reports" onclick="switchTab('reports')" class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-xl font-medium text-sm text-left transition-all">
+                    <span class="material-symbols-outlined text-[22px]">assessment</span>
+                    <span>Financial Reports</span>
+                </button>
+            </li>
+        </ul>
+
+        <!-- Bottom User Profile Footer -->
+        <div class="border-t border-outline-variant pt-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="images/kasirin-logo.svg" alt="KasirIn POS Logo" class="h-10 w-auto" />
+                <div class="w-9 h-9 rounded-full bg-primary-container text-on-primary-container font-extrabold flex items-center justify-center text-xs" id="user-avatar">
+                    SO
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-on-surface" id="user-name">Alex Wright</p>
+                    <p class="text-[10px] text-on-surface-variant font-medium" id="user-role-badge">Store Owner</p>
+                </div>
             </div>
+            <span class="material-symbols-outlined text-success text-[18px]">verified</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="flex-1 flex flex-col md:ml-[280px] w-full min-h-screen bg-[#f8f9ff]">
+        <!-- Top App Header Bar -->
+        <header class="flex justify-between items-center w-full h-16 px-6 bg-white border-b border-outline-variant shadow-xs sticky top-0 z-40">
             <div class="flex items-center gap-4">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                    Live Cloud Service Online
-                </span>
-                <a href="https://github.com/deo23/kasirin" target="_blank" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors flex items-center gap-2">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                    GitHub Source
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Hero Showcase Section -->
-    <main class="max-w-7xl mx-auto px-6 py-12 w-full flex-grow flex flex-col gap-10">
-        <div class="text-center max-w-3xl mx-auto space-y-4">
-            <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3.5 py-1.5 rounded-full text-xs font-extrabold border border-blue-200">
-                <span class="material-symbols-outlined text-sm">rocket_launch</span>
-                KasirIn .NET 8 Enterprise POS Suite
-            </div>
-            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-                Modern Cloud Point of Sale & Financial Management
-            </h1>
-            <p class="text-base text-slate-600 font-medium leading-relaxed">
-                KasirIn is a high-performance C# .NET 8 Blazor Server application featuring 95+ realistic retail products, thermal receipts, live camera barcode scanning, financial reporting, and dual-role RBAC persona switching.
-            </p>
-        </div>
-
-        <!-- Live Deployment Info Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col gap-3 border-t-4 border-t-blue-600">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                    <span class="material-symbols-outlined">inventory_2</span>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">95+ Real Products Catalog</h3>
-                <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                    Pre-populated with 8 retail categories (Beverages, Snacks, Groceries, Bakery, Personal Care, Household, Health & Wellness) with studio photography.
-                </p>
-            </div>
-
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col gap-3 border-t-4 border-t-emerald-600">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                    <span class="material-symbols-outlined">qr_code_scanner</span>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">Live Camera Barcode Scanner</h3>
-                <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                    Integrated device camera scanner using HTML5 QR/Barcode SDK for real-time item lookup and quick POS cashier scanning.
-                </p>
-            </div>
-
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col gap-3 border-t-4 border-t-amber-600">
-                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-                    <span class="material-symbols-outlined">analytics</span>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900">Analytics & Excel Export</h3>
-                <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                    Real-time revenue metrics, profit reports, debt ledger tracking, and instant Excel (.xlsx) report generation.
-                </p>
-            </div>
-        </div>
-
-        <!-- Local Server Connection Box -->
-        <div class="bg-slate-900 text-white rounded-3xl p-8 border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="space-y-2 text-left">
-                <h2 class="text-2xl font-extrabold flex items-center gap-2">
-                    <span class="material-symbols-outlined text-blue-400">computer</span>
-                    Local Host Development Server Active
-                </h2>
-                <p class="text-xs text-slate-400 font-medium">
-                    KasirIn ASP.NET Core & Blazor WebApp is currently running live on your local environment:
-                </p>
-                <div class="flex flex-wrap gap-3 pt-2">
-                    <a href="http://localhost:5200" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors">
-                        <span class="w-2 h-2 rounded-full bg-white"></span>
-                        Open WebApp (http://localhost:5200)
-                    </a>
-                    <a href="http://localhost:5000/swagger" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition-colors">
-                        Open REST API Swagger (http://localhost:5000)
-                    </a>
+                <button class="md:hidden text-on-surface-variant p-2 rounded-lg hover:bg-surface-container-high" onclick="toggleMobileMenu()">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <img src="images/kasirin-logo.svg" alt="KasirIn POS" class="h-8 w-auto" />
                 </div>
             </div>
-            <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700/60 text-xs font-mono text-slate-300 space-y-1.5 w-full md:w-80">
-                <div class="flex justify-between"><span class="text-slate-400">Platform:</span> <span>.NET 8 Blazor</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Database:</span> <span>EF Core In-Memory</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Architecture:</span> <span>Clean CQRS</span></div>
-                <div class="flex justify-between"><span class="text-slate-400">Status:</span> <span class="text-emerald-400 font-bold">● Running</span></div>
-            </div>
-        </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 font-medium">
-        &copy; 2026 KasirIn Cloud POS Suite. All rights reserved. Powered by .NET 8 Blazor & Google Stitch Theme.
-    </footer>
+            <!-- RBAC Persona Switcher -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 bg-surface-container border border-outline-variant rounded-full p-1 text-xs shadow-inner">
+                    <button id="persona-owner" type="button" class="px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer bg-primary text-white shadow-xs" onclick="switchPersona('OWNER')">
+                        Store Owner
+                    </button>
+                    <button id="persona-cashier" type="button" class="px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer text-on-surface-variant hover:text-on-surface" onclick="switchPersona('CASHIER')">
+                        Cashier Staff
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content View -->
+        <main class="p-6 flex-grow">
+            
+            <!-- SECTION 1: ANALYTICS DASHBOARD -->
+            <div id="view-dashboard" class="flex flex-col gap-6 max-w-[1440px] mx-auto w-full">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Overview Dashboard</h2>
+                        <p class="text-xs text-on-surface-variant font-medium mt-0.5">Summary of daily sales performance for your store.</p>
+                    </div>
+                    <p class="text-xs font-bold text-primary bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full shadow-xs" id="today-date-text">
+                        Today, 14 Aug 2026
+                    </p>
+                </div>
+
+                <!-- Financial KPI Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-primary flex flex-col gap-1.5">
+                        <div class="flex justify-between items-start">
+                            <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Today's Sales Revenue</p>
+                            <span class="material-symbols-outlined text-primary bg-blue-50 rounded-full p-1.5 text-[20px]">payments</span>
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-on-surface tabular-nums" id="kpi-revenue">Rp 4,250,000</h3>
+                        <p class="text-xs font-bold text-primary flex items-center gap-1 mt-0.5">
+                            <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                            +12.5% vs yesterday
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-success flex flex-col gap-1.5">
+                        <div class="flex justify-between items-start">
+                            <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Net Profit</p>
+                            <span class="material-symbols-outlined text-success bg-emerald-50 rounded-full p-1.5 text-[20px]">account_balance_wallet</span>
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-on-surface tabular-nums" id="kpi-profit">Rp 1,120,000</h3>
+                        <p class="text-xs font-bold text-success flex items-center gap-1 mt-0.5">
+                            <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                            +8.2% vs yesterday
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-warning flex flex-col gap-1.5">
+                        <div class="flex justify-between items-start">
+                            <p class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total Sales Count</p>
+                            <span class="material-symbols-outlined text-amber-700 bg-amber-50 rounded-full p-1.5 text-[20px]">receipt_long</span>
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-on-surface tabular-nums" id="kpi-count">142 Sales</h3>
+                        <p class="text-xs font-bold text-on-surface-variant flex items-center gap-1 mt-0.5">
+                            <span class="material-symbols-outlined text-[16px]">horizontal_rule</span>
+                            Stable volume
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Main Section: Weekly Sales Chart & Low Stock Alert -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-2xl border border-outline-variant shadow-xs p-5 flex flex-col h-[380px]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-on-surface">Weekly Sales Trend</h3>
+                            <button onclick="switchTab('reports')" class="text-xs font-bold text-primary hover:underline flex items-center gap-0.5">
+                                Report Details <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                            </button>
+                        </div>
+                        <div class="flex-1 w-full bg-slate-50 rounded-xl border border-outline-variant border-dashed flex items-end p-4 gap-3 relative">
+                            <div class="flex-1 bg-primary rounded-t-lg h-[40%] hover:opacity-80 transition-all group relative flex justify-center">
+                                <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 1.2M</span>
+                            </div>
+                            <div class="flex-1 bg-primary rounded-t-lg h-[60%] hover:opacity-80 transition-all group relative flex justify-center">
+                                <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 2.1M</span>
+                            </div>
+                            <div class="flex-1 bg-primary rounded-t-lg h-[45%] hover:opacity-80 transition-all group relative flex justify-center">
+                                <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 1.5M</span>
+                            </div>
+                            <div class="flex-1 bg-primary rounded-t-lg h-[75%] hover:opacity-80 transition-all group relative flex justify-center">
+                                <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 3.2M</span>
+                            </div>
+                            <div class="flex-1 bg-primary rounded-t-lg h-[65%] hover:opacity-80 transition-all group relative flex justify-center">
+                                <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 2.8M</span>
+                            </div>
+                            <div class="flex-1 bg-blue-500 rounded-t-lg h-[90%] shadow-md hover:opacity-80 transition-all group relative flex justify-center">
+                                <span class="opacity-0 group-hover:opacity-100 absolute -top-7 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded font-bold transition-opacity">Rp 4.25M</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Alert Widget -->
+                    <div class="bg-white rounded-2xl border border-outline-variant shadow-xs p-5 flex flex-col justify-between h-[380px]">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-base font-bold text-on-surface flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-error text-[20px]">warning</span>
+                                    Low Stock Alert
+                                </h3>
+                                <span class="text-[10px] font-bold bg-error-container text-on-error-container px-2 py-0.5 rounded-full">&lt; 5 pcs</span>
+                            </div>
+                            <ul class="flex flex-col gap-2.5 overflow-y-auto max-h-[240px] pr-1" id="dash-low-stock-list">
+                                <!-- Dynamic JS items -->
+                            </ul>
+                        </div>
+                        <button onclick="switchTab('inventory')" class="w-full mt-4 text-xs font-bold text-primary border border-primary hover:bg-primary hover:text-white py-2.5 rounded-xl transition-colors text-center block">
+                            Restock Inventory
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions Table -->
+                <div class="bg-white rounded-2xl border border-outline-variant shadow-xs overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-outline-variant flex justify-between items-center bg-slate-50">
+                        <h3 class="text-base font-bold text-on-surface">Recent Transactions</h3>
+                        <button onclick="switchTab('pos')" class="text-xs font-bold text-primary hover:underline flex items-center gap-0.5">
+                            POS Cashier <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 border-b border-outline-variant text-xs text-on-surface-variant font-bold uppercase tracking-wider">
+                                <tr>
+                                    <th class="py-3 px-4">Time</th>
+                                    <th class="py-3 px-4">Invoice #</th>
+                                    <th class="py-3 px-4">Items</th>
+                                    <th class="py-3 px-4">Method</th>
+                                    <th class="py-3 px-4 text-right">Total Amount</th>
+                                    <th class="py-3 px-4 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant/60 text-xs font-medium" id="dash-transactions-body">
+                                <!-- Dynamic JS Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: POS CASHIER INTERFACE -->
+            <div id="view-pos" class="hidden flex-col lg:flex-row gap-6 max-w-[1440px] mx-auto w-full">
+                <!-- Left Catalog Column -->
+                <div class="flex-1 flex flex-col gap-4 min-w-0">
+                    <!-- Search & Filter Bar -->
+                    <div class="bg-white p-4 rounded-2xl border border-outline-variant shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div class="relative w-full sm:w-80">
+                            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+                            <input type="text" id="pos-search-input" oninput="renderPOSProducts()" placeholder="Search product name or SKU..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-outline-variant rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary" />
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button onclick="openScannerModal()" class="flex-1 sm:flex-initial px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors border border-slate-300">
+                                <span class="material-symbols-outlined text-[18px]">qr_code_scanner</span>
+                                Camera Scan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Category Pills Filter Bar -->
+                    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-none" id="pos-category-bar">
+                        <!-- Dynamic Categories -->
+                    </div>
+
+                    <!-- Product Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 max-h-[640px] overflow-y-auto pr-1" id="pos-product-grid">
+                        <!-- Dynamic Product Cards -->
+                    </div>
+                </div>
+
+                <!-- Right Interactive Shopping Cart Column -->
+                <div class="w-full lg:w-[380px] xl:w-[420px] flex flex-col bg-white rounded-2xl border border-outline-variant shadow-xs overflow-hidden flex-shrink-0">
+                    <div class="p-4 border-b border-outline-variant bg-slate-50 flex justify-between items-center">
+                        <h2 class="text-base font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">shopping_cart</span>
+                            Shopping Cart (<span id="cart-item-count">0</span>)
+                        </h2>
+                        <button onclick="clearCart()" class="text-xs font-bold text-error hover:underline">Clear</button>
+                    </div>
+
+                    <!-- Cart Item List -->
+                    <div class="p-4 flex-1 overflow-y-auto max-h-[360px] flex flex-col gap-3" id="cart-items-container">
+                        <!-- Dynamic Cart Rows -->
+                    </div>
+
+                    <!-- Checkout Summary -->
+                    <div class="border-t border-outline-variant bg-white p-4 flex flex-col gap-3 shadow-md">
+                        <div class="flex flex-col gap-1.5 text-xs">
+                            <div class="flex justify-between items-center text-on-surface-variant">
+                                <span>Subtotal</span>
+                                <span class="font-bold tabular-nums" id="cart-subtotal">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-on-surface-variant">
+                                <span>Tax (10%)</span>
+                                <span class="font-bold tabular-nums" id="cart-tax">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center text-on-surface font-extrabold text-sm border-t border-slate-100 pt-1.5 mt-1">
+                                <span>Grand Total</span>
+                                <span class="text-primary tabular-nums" id="cart-grandtotal">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <button onclick="openCheckoutModal()" class="w-full bg-primary hover:bg-blue-700 text-white font-extrabold py-3.5 rounded-xl transition-all shadow-md text-sm flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">payments</span>
+                            Process Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: INVENTORY MASTER -->
+            <div id="view-inventory" class="hidden flex-col gap-6 max-w-[1440px] mx-auto w-full">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Inventory Master</h2>
+                        <p class="text-xs text-on-surface-variant font-medium mt-0.5">Manage product stock levels, pricing, and master catalog.</p>
+                    </div>
+                </div>
+
+                <!-- Data Table Container -->
+                <div class="bg-white rounded-2xl border border-outline-variant shadow-xs overflow-hidden">
+                    <div class="p-4 border-b border-outline-variant bg-slate-50 flex justify-between items-center gap-4">
+                        <input type="text" id="inv-search-input" oninput="renderInventoryTable()" placeholder="Search inventory by name or SKU..." class="w-full max-w-md px-4 py-2 bg-white border border-outline-variant rounded-xl text-xs font-medium" />
+                        <select id="inv-category-select" onchange="renderInventoryTable()" class="px-3 py-2 bg-white border border-outline-variant rounded-xl text-xs font-bold text-on-surface">
+                            <option value="All">All Categories</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Groceries">Groceries</option>
+                            <option value="Dairy & Eggs">Dairy & Eggs</option>
+                            <option value="Bakery">Bakery</option>
+                            <option value="Personal Care">Personal Care</option>
+                            <option value="Household">Household</option>
+                            <option value="Health & Wellness">Health & Wellness</option>
+                        </select>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 border-b border-outline-variant text-xs text-on-surface-variant font-bold uppercase tracking-wider">
+                                <tr>
+                                    <th class="py-3.5 px-4">SKU</th>
+                                    <th class="py-3.5 px-4">Product Name</th>
+                                    <th class="py-3.5 px-4">Category</th>
+                                    <th class="py-3.5 px-4 text-right">Stock Quantity</th>
+                                    <th class="py-3.5 px-4 text-right cost-col">Cost Price</th>
+                                    <th class="py-3.5 px-4 text-right">Selling Price</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant/60 text-xs font-medium" id="inv-table-body">
+                                <!-- Dynamic Inventory Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: FINANCIAL REPORTS -->
+            <div id="view-reports" class="hidden flex-col gap-6 max-w-[1440px] mx-auto w-full">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Financial Reports & Debt Ledger</h2>
+                        <p class="text-xs text-on-surface-variant font-medium mt-0.5">Comprehensive P&L analysis and customer debt records.</p>
+                    </div>
+                    <button onclick="alert('Exporting Financial Report (.xlsx)... Download started!')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-xs flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        Export Excel (.xlsx)
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-blue-600">
+                        <p class="text-xs font-bold text-on-surface-variant uppercase">Total Gross Revenue</p>
+                        <h3 class="text-2xl font-extrabold text-on-surface mt-1">Rp 4,250,000</h3>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-emerald-600">
+                        <p class="text-xs font-bold text-on-surface-variant uppercase">Net Profit Margin</p>
+                        <h3 class="text-2xl font-extrabold text-emerald-600 mt-1">26.3% (Rp 1,120,000)</h3>
+                    </div>
+                    <div class="bg-white rounded-xl p-5 border border-outline-variant shadow-xs border-l-4 border-l-amber-600">
+                        <p class="text-xs font-bold text-on-surface-variant uppercase">Total Outstanding Debt</p>
+                        <h3 class="text-2xl font-extrabold text-amber-700 mt-1">Rp 1,100,000</h3>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPT APPLICATION LOGIC -->
+    <script>
+        const productsData = [
+            { id: "1", name: "Organic Dark Roast Whole Bean Coffee 500g", category: "Beverages", sku: "BEV-101", cost: 120000, price: 185000, stock: 45, img: "uploads/products/organic_coffee_beans.jpg" },
+            { id: "2", name: "Premium Japanese Uji Matcha Green Tea Powder 200g", category: "Beverages", sku: "BEV-102", cost: 70000, price: 125000, stock: 18, img: "uploads/products/matcha_tea_powder.jpg" },
+            { id: "3", name: "Sparkling Natural Mineral Water 750ml", category: "Beverages", sku: "BEV-103", cost: 18000, price: 35000, stock: 60, img: "uploads/products/sparkling_mineral_water.jpg" },
+            { id: "4", name: "Artisanal Sparkling Kombucha Ginger Lemon 330ml", category: "Beverages", sku: "BEV-104", cost: 22000, price: 42000, stock: 3, img: "uploads/products/sparkling_kombucha.jpg" },
+            { id: "5", name: "Artisanal 75% Single-Origin Dark Chocolate Bar", category: "Snacks", sku: "SNK-101", cost: 38000, price: 65000, stock: 30, img: "uploads/products/dark_chocolate_bar.jpg" },
+            { id: "6", name: "Gourmet Whole Roasted Sea Salt Almonds 250g", category: "Snacks", sku: "SNK-102", cost: 55000, price: 95000, stock: 12, img: "uploads/products/roasted_almonds.jpg" },
+            { id: "7", name: "Cold-Pressed Extra Virgin Olive Oil 750ml", category: "Groceries", sku: "GRC-101", cost: 135000, price: 210000, stock: 25, img: "uploads/products/olive_oil_bottle.jpg" },
+            { id: "8", name: "Fresh Organic Hass Avocados (Pack of 4)", category: "Groceries", sku: "GRC-102", cost: 45000, price: 75000, stock: 4, img: "uploads/products/organic_avocados.jpg" },
+            { id: "9", name: "Cold-Brewed Earl Black Tea 500ml", category: "Beverages", sku: "BEV-105", cost: 15000, price: 28000, stock: 40, img: "https://images.unsplash.com/photo-1594631252845-29fc4cc86de5?w=500&auto=format&fit=crop&q=80" },
+            { id: "10", name: "Organic Cold-Pressed Orange Juice 1L", category: "Beverages", sku: "BEV-106", cost: 35000, price: 58000, stock: 2, img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=500&auto=format&fit=crop&q=80" },
+            { id: "11", name: "Freshly Baked French Butter Croissant (Pack of 4)", category: "Bakery", sku: "BAK-101", cost: 28000, price: 48000, stock: 15, img: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=500&auto=format&fit=crop&q=80" },
+            { id: "12", name: "Artisanal Sourdough Bread Loaf 600g", category: "Bakery", sku: "BAK-102", cost: 35000, price: 60000, stock: 8, img: "https://images.unsplash.com/photo-1589367920969-ab8e050bbb04?w=500&auto=format&fit=crop&q=80" },
+            { id: "13", name: "Botanical Argan Oil Shampoo 400ml", category: "Personal Care", sku: "PER-101", cost: 65000, price: 115000, stock: 22, img: "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=500&auto=format&fit=crop&q=80" },
+            { id: "14", name: "Eco-Friendly Plant-Based Dish Soap 500ml", category: "Household", sku: "HSH-101", cost: 22000, price: 38000, stock: 50, img: "https://images.unsplash.com/photo-1585842378054-ee2e52f94ba2?w=500&auto=format&fit=crop&q=80" },
+            { id: "15", name: "Multivitamin Daily Health Complex 60 Capsules", category: "Health & Wellness", sku: "HLT-101", cost: 85000, price: 145000, stock: 19, img: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=500&auto=format&fit=crop&q=80" }
+        ];
+
+        let selectedCategory = "All";
+        let cart = [];
+        let isOwner = true;
+
+        const categoriesList = ["All", "Beverages", "Snacks", "Groceries", "Dairy & Eggs", "Bakery", "Personal Care", "Household", "Health & Wellness"];
+
+        function initApp() {
+            renderDashboard();
+            renderPOSCategoryBar();
+            renderPOSProducts();
+            renderInventoryTable();
+        }
+
+        function switchTab(tab) {
+            ["dashboard", "pos", "inventory", "reports"].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add("hidden");
+                document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-xl font-medium text-sm text-left transition-all";
+            });
+
+            document.getElementById(`view-${tab}`).classList.remove("hidden");
+            document.getElementById(`view-${tab}`).classList.add("flex");
+            document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 bg-primary text-white font-bold rounded-xl text-sm text-left transition-all shadow-xs";
+        }
+
+        function switchPersona(role) {
+            isOwner = role === 'OWNER';
+            document.getElementById('persona-owner').className = isOwner ? "px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer bg-primary text-white shadow-xs" : "px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer text-on-surface-variant hover:text-on-surface";
+            document.getElementById('persona-cashier').className = !isOwner ? "px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer bg-primary text-white shadow-xs" : "px-3 py-1 rounded-full font-extrabold transition-all duration-200 cursor-pointer text-on-surface-variant hover:text-on-surface";
+            document.getElementById('user-name').innerText = isOwner ? "Alex Wright" : "Sarah Jenkins";
+            document.getElementById('user-role-badge').innerText = isOwner ? "Store Owner" : "Cashier Staff";
+            document.getElementById('user-avatar').innerText = isOwner ? "SO" : "CS";
+
+            document.querySelectorAll('.cost-col').forEach(el => {
+                el.style.display = isOwner ? '' : 'none';
+            });
+        }
+
+        function renderDashboard() {
+            const lowStock = productsData.filter(p => p.stock < 5);
+            const listEl = document.getElementById("dash-low-stock-list");
+            listEl.innerHTML = lowStock.map(p => `
+                <li class="flex justify-between items-center bg-red-50 p-2.5 rounded-xl border border-red-200">
+                    <div>
+                        <p class="text-xs font-bold text-slate-900 leading-tight">${p.name}</p>
+                        <p class="text-[10px] text-slate-500 font-mono">SKU: ${p.sku}</p>
+                    </div>
+                    <span class="bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md">${p.stock} pcs</span>
+                </li>
+            `).join("");
+
+            const trxs = [
+                { time: "10 mins ago", inv: "TRX-0988", items: "2 items", method: "QRIS", total: "Rp 250,000" },
+                { time: "28 mins ago", inv: "TRX-0987", items: "1 item", method: "CASH", total: "Rp 185,000" },
+                { time: "45 mins ago", inv: "TRX-0986", items: "3 items", method: "TRANSFER", total: "Rp 420,000" }
+            ];
+            document.getElementById("dash-transactions-body").innerHTML = trxs.map(t => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-3 px-4 text-slate-500">${t.time}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-900">${t.inv}</td>
+                    <td class="py-3 px-4">${t.items}</td>
+                    <td class="py-3 px-4 font-bold text-slate-700">${t.method}</td>
+                    <td class="py-3 px-4 text-right font-bold text-blue-600">${t.total}</td>
+                    <td class="py-3 px-4 text-center"><span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">Paid</span></td>
+                </tr>
+            `).join("");
+        }
+
+        function renderPOSCategoryBar() {
+            const bar = document.getElementById("pos-category-bar");
+            bar.innerHTML = categoriesList.map(cat => `
+                <button onclick="selectPOSCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${selectedCategory === cat ? 'bg-primary text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}">
+                    ${cat}
+                </button>
+            `).join("");
+        }
+
+        function selectPOSCategory(cat) {
+            selectedCategory = cat;
+            renderPOSCategoryBar();
+            renderPOSProducts();
+        }
+
+        function renderPOSProducts() {
+            const search = document.getElementById("pos-search-input").value.toLowerCase();
+            const grid = document.getElementById("pos-product-grid");
+            const filtered = productsData.filter(p => {
+                const matchCat = (selectedCategory === "All" || selectedCategory === "Semua") || p.category.toLowerCase() === selectedCategory.toLowerCase();
+                const matchSearch = !search || p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-bold text-sm">No products found</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                <div onclick="addToCart('${p.id}')" class="bg-white rounded-xl border ${p.stock < 5 ? 'border-red-300' : 'border-slate-200'} p-3 flex flex-col gap-2 cursor-pointer hover:border-blue-600 hover:shadow-md transition-all group relative">
+                    <div class="absolute top-2 right-2 ${p.stock < 5 ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'} px-2 py-0.5 rounded-md text-[11px] font-bold z-10">
+                        Stk: ${p.stock}
+                    </div>
+                    <div class="w-full aspect-square rounded-lg bg-slate-100 overflow-hidden flex items-center justify-center">
+                        <img src="${p.img}" alt="${p.name}" onerror="this.onerror=null;this.src='uploads/products/organic_coffee_beans.jpg';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    </div>
+                    <div class="flex flex-col mt-0.5">
+                        <h3 class="text-xs font-semibold text-slate-900 line-clamp-2 leading-snug">${p.name}</h3>
+                        <p class="text-sm font-bold text-blue-600 tabular-nums mt-1">Rp ${p.price.toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function addToCart(id) {
+            const p = productsData.find(x => x.id === id);
+            if (!p) return;
+            const existing = cart.find(x => x.id === id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ id: p.id, name: p.name, price: p.price, qty: 1 });
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById("cart-items-container");
+            document.getElementById("cart-item-count").innerText = cart.reduce((a, b) => a + b.qty, 0);
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="py-12 text-center text-slate-400 font-medium text-xs">Cart is empty</div>`;
+            } else {
+                container.innerHTML = cart.map(i => `
+                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <div class="flex-1 pr-2">
+                            <p class="text-xs font-bold text-slate-900 line-clamp-1">${i.name}</p>
+                            <p class="text-xs text-blue-600 font-extrabold mt-0.5">Rp ${(i.price * i.qty).toLocaleString()}</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="updateQty('${i.id}', -1)" class="w-6 h-6 rounded-lg bg-white border border-slate-300 font-bold flex items-center justify-center text-slate-700 hover:bg-slate-100">-</button>
+                            <span class="w-6 text-center text-xs font-bold tabular-nums">${i.qty}</span>
+                            <button onclick="updateQty('${i.id}', 1)" class="w-6 h-6 rounded-lg bg-white border border-slate-300 font-bold flex items-center justify-center text-slate-700 hover:bg-slate-100">+</button>
+                        </div>
+                    </div>
+                `).join("");
+            }
+
+            const subtotal = cart.reduce((a, b) => a + (b.price * b.qty), 0);
+            const tax = Math.round(subtotal * 0.10);
+            const grandTotal = subtotal + tax;
+
+            document.getElementById("cart-subtotal").innerText = `Rp ${subtotal.toLocaleString()}`;
+            document.getElementById("cart-tax").innerText = `Rp ${tax.toLocaleString()}`;
+            document.getElementById("cart-grandtotal").innerText = `Rp ${grandTotal.toLocaleString()}`;
+        }
+
+        function updateQty(id, delta) {
+            const item = cart.find(x => x.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+            renderCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+        }
+
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                alert("Cart is empty! Select products first.");
+                return;
+            }
+            alert("Transaction Processed Successfully! Thermal Receipt Printed.");
+            clearCart();
+        }
+
+        function openScannerModal() {
+            alert("Camera Barcode Scanner Modal Activated! Point device camera to product barcode.");
+        }
+
+        function renderInventoryTable() {
+            const search = document.getElementById("inv-search-input").value.toLowerCase();
+            const catSelect = document.getElementById("inv-category-select").value;
+            const body = document.getElementById("inv-table-body");
+
+            const filtered = productsData.filter(p => {
+                const matchCat = (catSelect === "All" || catSelect === "Semua") || p.category.toLowerCase() === catSelect.toLowerCase();
+                const matchSearch = !search || p.name.toLowerCase().includes(search) || p.sku.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+
+            body.innerHTML = filtered.map(p => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-3.5 px-4 font-mono font-bold text-slate-900">${p.sku}</td>
+                    <td class="py-3.5 px-4 flex items-center gap-2.5">
+                        <img src="${p.img}" alt="${p.name}" onerror="this.onerror=null;this.src='uploads/products/organic_coffee_beans.jpg';" class="w-8 h-8 rounded-lg object-cover border border-slate-200" />
+                        <span class="font-bold text-slate-900">${p.name}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-600">${p.category}</td>
+                    <td class="py-3.5 px-4 text-right">
+                        ${p.stock < 5 ? `<span class="inline-flex px-2.5 py-1 rounded-full bg-red-100 text-red-800 font-extrabold text-[11px]">${p.stock} pcs (Low Stock)</span>` : `<span class="inline-flex px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">${p.stock} pcs</span>`}
+                    </td>
+                    <td class="py-3.5 px-4 text-right font-mono text-slate-600 cost-col">Rp ${p.cost.toLocaleString()}</td>
+                    <td class="py-3.5 px-4 text-right font-mono font-bold text-blue-600">Rp ${p.price.toLocaleString()}</td>
+                </tr>
+            `).join("");
+        }
+
+        window.onload = initApp;
+    </script>
 </body>
 </html>
