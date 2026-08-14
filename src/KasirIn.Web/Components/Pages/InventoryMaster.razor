@@ -74,7 +74,7 @@
             <div class="flex items-center gap-2">
                 <select class="px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs font-bold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
                         @bind="_selectedCategory" @bind:after="FilterProducts">
-                    <option value="Semua">All Categories</option>
+                    <option value="All">All Categories</option>
                     <option value="Beverages">Beverages</option>
                     <option value="Snacks">Snacks</option>
                     <option value="Groceries">Groceries</option>
@@ -139,7 +139,7 @@
                                     @if (prod.StockQuantity < 5)
                                     {
                                         <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-extrabold text-[11px] ring-1 ring-error">
-                                            @prod.StockQuantity pcs (Nipis)
+                                            @prod.StockQuantity pcs (Low Stock)
                                         </span>
                                     }
                                     else
@@ -250,7 +250,7 @@
     private List<ProductDto> _products = new();
     private List<ProductDto> _filteredProducts = new();
     private string _searchTerm = string.Empty;
-    private string _selectedCategory = "Semua";
+    private string _selectedCategory = "All";
     private bool _isLoading = true;
 
     // Modal State
