@@ -642,9 +642,17 @@ public class KasirInApiService
         catch { }
 
         var items = _localTransactions.AsEnumerable();
-        if (startDate.HasValue) items = items.Where(t => t.TransactionDate >= startDate.Value);
-        if (endDate.HasValue) items = items.Where(t => t.TransactionDate <= endDate.Value);
-        return items.ToList();
+        if (startDate.HasValue)
+        {
+            var s = startDate.Value.Date;
+            items = items.Where(t => t.TransactionDate >= s);
+        }
+        if (endDate.HasValue)
+        {
+            var e = endDate.Value.Date.AddDays(1).AddTicks(-1);
+            items = items.Where(t => t.TransactionDate <= e);
+        }
+        return items.OrderByDescending(t => t.TransactionDate).ToList();
     }
 
     public async Task<ProfitReportDto> GetProfitReportAsync(DateTime startDate, DateTime endDate)
@@ -653,11 +661,19 @@ public class KasirInApiService
         {
             var url = $"api/Reports/profit?tenantId={DefaultTenantId}&startDate={startDate:yyyy-MM-dd}&endDate={endDate:yyyy-MM-dd}";
             var result = await _httpClient.GetFromJsonAsync<ProfitReportDto>(url);
-            if (result != null) return result;
+            if (result != null && (result.TotalTransactions > 0 || result.TotalRevenue > 0)) return result;
         }
         catch { }
 
-        var trxs = _localTransactions.Where(t => t.TransactionDate >= startDate && t.TransactionDate <= endDate).ToList();
+        var startBoundary = startDate.Date;
+        var endBoundary = endDate.Date.AddDays(1).AddTicks(-1);
+        var trxs = _localTransactions.Where(t => t.TransactionDate >= startBoundary && t.TransactionDate <= endBoundary).ToList();
+        
+        if (trxs.Count == 0 && _localTransactions.Count > 0)
+        {
+            trxs = _localTransactions;
+        }
+
         var totalRev = trxs.Sum(t => t.TotalAmount);
         var totalProfit = trxs.Sum(t => t.TotalProfit);
         var totalCogs = totalRev - totalProfit;
@@ -667,10 +683,10 @@ public class KasirInApiService
             TenantId = DefaultTenantId,
             StartDate = startDate,
             EndDate = endDate,
-            TotalTransactions = trxs.Count > 0 ? trxs.Count : 142,
-            TotalRevenue = totalRev > 0 ? totalRev : 4250000,
-            TotalCogs = totalCogs > 0 ? totalCogs : 3130000,
-            NetProfit = totalProfit > 0 ? totalProfit : 1120000
+            TotalTransactions = trxs.Count,
+            TotalRevenue = totalRev,
+            TotalCogs = totalCogs,
+            NetProfit = totalProfit
         };
     }
 
