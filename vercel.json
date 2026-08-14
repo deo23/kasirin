@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "kasirin-pos",
+  "builds": [
+    {
+      "src": "src/KasirIn.Web/wwwroot/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/KasirIn.Web/wwwroot/$1"
+    }
+  ]
+}

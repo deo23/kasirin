@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  kasirin-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    command: dotnet run --project src/KasirIn.Api/KasirIn.Api.csproj -c Release --urls "http://0.0.0.0:5000"
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+
+  kasirin-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5200:5200"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ApiBaseUrl=http://kasirin-api:5000
+    depends_on:
+      - kasirin-api
