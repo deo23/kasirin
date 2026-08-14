@@ -13,6 +13,7 @@ builder.Services.AddScoped(sp => new HttpClient
     BaseAddress = new Uri(apiBaseUrl)
 });
 builder.Services.AddScoped<KasirInApiService>();
+builder.Services.AddScoped<KasirInUserSession>();
 
 var app = builder.Build();
 

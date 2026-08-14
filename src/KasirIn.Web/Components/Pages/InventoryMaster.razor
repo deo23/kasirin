@@ -1,6 +1,8 @@
 @page "/inventory"
 @rendermode InteractiveServer
 @inject KasirInApiService ApiService
+@inject KasirInUserSession UserSession
+@implements IDisposable
 
 <PageTitle>KasirIn - Manajemen Stok & Inventaris</PageTitle>
 
@@ -90,7 +92,10 @@
                         <th class="py-3.5 px-4">Nama Produk</th>
                         <th class="py-3.5 px-4">Kategori</th>
                         <th class="py-3.5 px-4 text-right">Stok</th>
-                        <th class="py-3.5 px-4 text-right">Harga Modal (HPP)</th>
+                        @if (UserSession.IsOwner)
+                        {
+                            <th class="py-3.5 px-4 text-right">Harga Modal (HPP)</th>
+                        }
                         <th class="py-3.5 px-4 text-right">Harga Jual</th>
                         <th class="py-3.5 px-4 text-center">Aksi</th>
                     </tr>
@@ -99,7 +104,7 @@
                     @if (_isLoading)
                     {
                         <tr>
-                            <td colspan="7" class="py-8 text-center text-on-surface-variant">
+                            <td colspan="@(UserSession.IsOwner ? 7 : 6)" class="py-8 text-center text-on-surface-variant">
                                 <span class="material-symbols-outlined animate-spin text-lg align-middle mr-1">sync</span> Memuat data produk...
                             </td>
                         </tr>
@@ -107,7 +112,7 @@
                     else if (_filteredProducts.Count == 0)
                     {
                         <tr>
-                            <td colspan="7" class="py-8 text-center text-on-surface-variant">Tidak ada produk ditemukan.</td>
+                            <td colspan="@(UserSession.IsOwner ? 7 : 6)" class="py-8 text-center text-on-surface-variant">Tidak ada produk ditemukan.</td>
                         </tr>
                     }
                     else
@@ -140,7 +145,10 @@
                                         </span>
                                     }
                                 </td>
-                                <td class="py-3 px-4 text-right font-mono text-on-surface-variant">Rp @prod.CostPrice.ToString("N0")</td>
+                                @if (UserSession.IsOwner)
+                                {
+                                    <td class="py-3 px-4 text-right font-mono text-on-surface-variant">Rp @prod.CostPrice.ToString("N0")</td>
+                                }
                                 <td class="py-3 px-4 text-right font-mono font-bold text-primary">Rp @prod.SellingPrice.ToString("N0")</td>
                                 <td class="py-3 px-4 text-center">
                                     <button class="text-on-surface-variant hover:text-primary transition-colors p-1" @onclick="() => EditProduct(prod)" title="Edit">
@@ -253,7 +261,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        UserSession.OnRoleChanged += StateHasChanged;
         await LoadProducts();
+    }
+
+    public void Dispose()
+    {
+        UserSession.OnRoleChanged -= StateHasChanged;
     }
 
     private async Task LoadProducts()
