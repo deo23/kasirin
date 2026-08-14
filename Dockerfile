@@ -32,6 +32,7 @@ WORKDIR /app
 COPY --from=build /out/web ./
 
 ENV ASPNETCORE_URLS=http://+:5200
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
 EXPOSE 5200 80 8080
 
 ENTRYPOINT ["dotnet", "KasirIn.Web.dll"]

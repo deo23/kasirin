@@ -11,6 +11,7 @@ services:
       - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
 
   kasirin-web:
     build:
@@ -21,5 +22,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ApiBaseUrl=http://kasirin-api:5000
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
     depends_on:
       - kasirin-api
