@@ -23,7 +23,13 @@
                 <button class="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors @(_dateRange == "Month" ? "bg-surface text-primary border border-outline-variant shadow-xs" : "text-on-surface-variant hover:bg-surface-container-high")"
                         @onclick='() => ChangeDateRange("Month")'>Bulan Ini</button>
             </div>
-            <button class="px-4 py-2 bg-primary text-on-primary rounded-xl font-bold text-xs flex items-center gap-1.5 hover:bg-primary-hover shadow-xs"
+            <button type="button" class="px-4 py-2 bg-[#107C41] text-white rounded-xl font-extrabold text-xs flex items-center gap-1.5 hover:bg-[#0b5c30] transition-colors shadow-xs cursor-pointer disabled:opacity-50"
+                    disabled="@_isExportingExcel"
+                    @onclick="DownloadExcelReport">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                @(_isExportingExcel ? "Mengunduh..." : "Export Excel (.xlsx)")
+            </button>
+            <button type="button" class="px-4 py-2 bg-primary text-white rounded-xl font-extrabold text-xs flex items-center gap-1.5 hover:bg-primary-hover transition-colors shadow-xs cursor-pointer"
                     @onclick="OpenDebtModal">
                 <span class="material-symbols-outlined text-[18px]">menu_book</span> Catat Kasbon
             </button>
@@ -268,6 +274,21 @@
         var (start, end) = GetDates();
         _report = await ApiService.GetProfitReportAsync(start, end);
         _debts = await ApiService.GetDebtsAsync();
+    }
+
+    private bool _isExportingExcel = false;
+
+    private async Task DownloadExcelReport()
+    {
+        _isExportingExcel = true;
+        var excelBytes = await ApiService.ExportExcelReportAsync();
+        _isExportingExcel = false;
+        if (excelBytes != null && excelBytes.Length > 0)
+        {
+            var base64 = Convert.ToBase64String(excelBytes);
+            var url = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{base64}";
+            await JSRuntime.InvokeVoidAsync("open", url, "_blank");
+        }
     }
 
     private async Task ChangeDateRange(string range)

@@ -311,6 +311,24 @@ public class KasirInApiService
         };
     }
 
+    public async Task<byte[]?> ExportExcelReportAsync()
+    {
+        try
+        {
+            var url = $"api/Reports/export-excel?tenantId={DefaultTenantId}";
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsByteArrayAsync();
+            }
+        }
+        catch
+        {
+            // Fallback
+        }
+        return null;
+    }
+
     public async Task<List<CustomerDebtDto>> GetDebtsAsync()
     {
         return await Task.FromResult(_localDebts.OrderByDescending(d => d.CreatedAt).ToList());
