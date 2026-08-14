@@ -453,7 +453,7 @@
     private void FilterProducts()
     {
         var items = _products.AsEnumerable();
-        if (_selectedCategory != "Semua")
+        if (_selectedCategory != "Semua" && _selectedCategory != "All")
         {
             items = items.Where(p => p.CategoryName.Equals(_selectedCategory, StringComparison.OrdinalIgnoreCase));
         }
